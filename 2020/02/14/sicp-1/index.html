@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="SICP (1)"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/02/14/sicp-1/"/>
+
+
+<meta name="description" content="记录学习的知识点。 程序设计的基本元素 基本表达形式，最简单的个体。 组合的方法，从简单的东西出发构造出复合的元素。 抽象的方法，为复合对象命名，并将他们当做单元去操作。  表达式234 ，就是一个数，它也是一个表示数的表达式。+ - * &#x2F; ,这些运算符，属于表示过程的表达式，比如表示加的过程，表示减的过程。将这两个组合，就形成了复合表达式。表示把加减乘除的过程应用到这些数上。 12(+ 112">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SICP (1)">
+<meta property="og:url" content="http://yoursite.com/2020/02/14/sicp-1/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="记录学习的知识点。 程序设计的基本元素 基本表达形式，最简单的个体。 组合的方法，从简单的东西出发构造出复合的元素。 抽象的方法，为复合对象命名，并将他们当做单元去操作。  表达式234 ，就是一个数，它也是一个表示数的表达式。+ - * &#x2F; ,这些运算符，属于表示过程的表达式，比如表示加的过程，表示减的过程。将这两个组合，就形成了复合表达式。表示把加减乘除的过程应用到这些数上。 12(+ 112">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15816926882191.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15816995339160.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15817003951342.jpg">
+<meta property="article:published_time" content="2020-02-14T14:00:36.807Z">
+<meta property="article:modified_time" content="2020-02-16T14:47:11.049Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15816926882191.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> SICP (1) - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          SICP (1)
+        
+      </h1>
+
+      <time class="post-time">
+          2020-02-14
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>记录学习的知识点。</p>
+<h3 id="程序设计的基本元素"><a href="#程序设计的基本元素" class="headerlink" title="程序设计的基本元素"></a>程序设计的基本元素</h3><ol>
+<li>基本表达形式，最简单的个体。</li>
+<li>组合的方法，从简单的东西出发构造出复合的元素。</li>
+<li>抽象的方法，为复合对象命名，并将他们当做单元去操作。</li>
+</ol>
+<h3 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h3><p>234 ，就是一个数，它也是一个表示数的表达式。<br>+ - * / ,这些运算符，属于表示过程的表达式，比如表示加的过程，表示减的过程。<br>将这两个组合，就形成了复合表达式。表示把加减乘除的过程应用到这些数上。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">+</span> <span class="number">112</span> <span class="number">342</span>)</span><br><span class="line"><span class="number">454</span></span><br></pre></td></tr></table></figure>
+<h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><p>我有一个数字3.14，我给它取一个名字叫pi，这个名字就叫变量，它的值就是3.14。</p>
+<p>scheme里用define方式完成:</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">define</span> pi <span class="number">3.14</span>)</span><br><span class="line">&gt; pi</span><br><span class="line"><span class="number">3.14</span></span><br></pre></td></tr></table></figure>
+
+<p>define它允许我们用一个简单的名字去引用一个组合运算的结果.</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">define</span> sum (<span class="name">+</span> <span class="number">2</span> <span class="number">2</span>))</span><br><span class="line">&gt; sum</span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>我们将3.14和pi这个名字用define定义好，后面又可以通过pi获取到3.14，那么解释器显然有存储能力，存储了pi和3.14的关系，这种存储就叫环境。</p>
+<p>环境所扮演的角色就是确定名字（符号）的意义。</p>
+<h3 id="组合式求值"><a href="#组合式求值" class="headerlink" title="组合式求值"></a>组合式求值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(* (+ 2 2)</span><br><span class="line">    (- 5 1))</span><br></pre></td></tr></table></figure>
+<p>这就是一个组合式，它是由若干个表达式组成的。<br>对它求值要做下面的事情：</p>
+<ol>
+<li>对它的子表达式们进行求值，求值(+ 2 2)得到值4，求值(- 5 1)得到值4。</li>
+<li>将最左边的运算符的过程应用到这两个值上，形成(* 4 4)。这两个值属于该表达式的参数。</li>
+</ol>
+<p>为了实现对组合式的求值，我们必须先对组合式里的每一个元素做同样的求值过程。在性质上，这一求值过程是递归的。</p>
+<p>用树状结构表示：</p>
+<p><img src="/image/15816926882191.jpg" alt=""></p>
+<h3 id="复合过程"><a href="#复合过程" class="headerlink" title="复合过程"></a>复合过程</h3><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">define</span></span> (<span class="name">square</span> x) (<span class="name"><span class="builtin-name">*</span></span> x x))</span><br></pre></td></tr></table></figure>
+<p>这个复合过程，表示将一个东西乘它自己。这个东西也给它取个名字叫x。<br>然后我们再将整个复合过程取一个名字叫square。</p>
+<p>定义好后，就可以调用它了。</p>
+<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; (square 10)</span><br><span class="line"><span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>我们还能将square当做基本构件去定义其他过程。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">define</span> (<span class="name">sum-of-squares</span> x y)</span><br><span class="line">  (<span class="name">+</span> (<span class="name">square</span> x) (<span class="name">square</span> y)))</span><br><span class="line">  </span><br><span class="line">&gt; (<span class="name">sum-of-squares</span> <span class="number">3</span> <span class="number">4</span>)</span><br><span class="line"><span class="number">25</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="代换模型"><a href="#代换模型" class="headerlink" title="代换模型"></a>代换模型</h3><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">define</span> (<span class="name">f</span> a)</span><br><span class="line">  (<span class="name">sum-of-squares</span> (<span class="name">+</span> a <span class="number">1</span>) (<span class="name">*</span> a <span class="number">2</span>)))</span><br></pre></td></tr></table></figure>
+
+<p>说白了就是将形参换成实参，比如将a换成5。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">f</span> <span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+<p>提取出f的体。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">sum-of-squares</span> (<span class="name">+</span> a <span class="number">1</span>) (<span class="name">*</span> a <span class="number">2</span>))</span><br></pre></td></tr></table></figure>
+<p>用实际的参数5替换其中的形式参数。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">sum-of-squares</span> (<span class="name">+</span> <span class="number">5</span> <span class="number">1</span>) (<span class="name">*</span> <span class="number">5</span> <span class="number">2</span>))</span><br></pre></td></tr></table></figure>
+<p>现在运算符是sum-of-squares，两个运算对象分别是(+ 5 1)和(* 5 2)。<br>我们必须对运算符求值，得到那个过程。还需要对两个对象进行求值。<br>两个对象分别是5和10，用它们替换掉sum-of-squares过程中参数x和y</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">+</span> (<span class="name">square</span> <span class="number">6</span>) (<span class="name">square</span> <span class="number">10</span>))</span><br></pre></td></tr></table></figure>
+<p>square又可以进一步约分为：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">+</span> (<span class="name">*</span> <span class="number">6</span> <span class="number">6</span>) (<span class="name">*</span> <span class="number">10</span> <span class="number">10</span>))</span><br></pre></td></tr></table></figure>
+<p>通过乘法又能将它们约分为:</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">+</span> <span class="number">36</span> <span class="number">100</span>)</span><br></pre></td></tr></table></figure>
+<p>最后得到</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">136</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="应用序和正则序"><a href="#应用序和正则序" class="headerlink" title="应用序和正则序"></a>应用序和正则序</h3><p>正则序的求值方法和上一章不同，而是先不求出对象的值，等用到它们的之后再去做。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">sum-of-squares</span> (<span class="name">+</span> <span class="number">5</span> <span class="number">1</span>) (<span class="name">*</span> <span class="number">5</span> <span class="number">2</span>))</span><br><span class="line">(<span class="name">+</span>  (<span class="name">square</span> (<span class="name">+</span> <span class="number">5</span> <span class="number">1</span>))    (<span class="name">square</span> (<span class="name">*</span> <span class="number">5</span> <span class="number">2</span>)))</span><br><span class="line">(<span class="name">+</span>  (<span class="name">*</span> (<span class="name">+</span> <span class="number">5</span> <span class="number">1</span>) (<span class="name">+</span> <span class="number">5</span> <span class="number">1</span>))   (<span class="name">*</span> (<span class="name">*</span> <span class="number">5</span> <span class="number">2</span>) (<span class="name">*</span> <span class="number">5</span> <span class="number">2</span> )))</span><br></pre></td></tr></table></figure>
+<p>然后才是约分：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">+</span>  (<span class="name">*</span> <span class="number">6</span> <span class="number">6</span>)   (<span class="name">*</span> <span class="number">10</span> <span class="number">10</span>))</span><br><span class="line">(<span class="name">+</span>    <span class="number">36</span>           <span class="number">100</span>)</span><br><span class="line">            <span class="number">136</span></span><br></pre></td></tr></table></figure>
+
+<p>与正则序对应的是现在解释器里用的，”先求值参数而后应用”的方式，它被称为应用序求值。</p>
+<h3 id="条件表达式"><a href="#条件表达式" class="headerlink" title="条件表达式"></a>条件表达式</h3><p>至此我们定义出的过程表达能力还非常有限，还没有办法根据某种结果去做不同的操作。</p>
+<p><img src="/image/15816995339160.jpg" alt=""></p>
+<p>这种结构称为分情况分析，检查一个数是正负或者0，根据不同的情况采取不同的动作。<br>Lisp中有着针对该情况的特殊形式，称为cond:</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">define</span> (<span class="name">abs</span> x)</span><br><span class="line">  (<span class="name">cond</span> ((<span class="name">&gt;</span> x <span class="number">0</span>) x)</span><br><span class="line">        ((<span class="name">=</span> x <span class="number">0</span>) <span class="number">0</span>)</span><br><span class="line">        ((<span class="name">&lt;</span> x <span class="number">0</span>) (<span class="name">-</span> x))))</span><br></pre></td></tr></table></figure>
+<p>它表示如果 (&gt; x 0)的条件为false，那就去求下一个(= x 0)，如果还是false那就以此类推，知道发现那个条件为True的为止。<br>如果无法找到为True的条件，cond的值就没有定义。</p>
+<p>还有一种写法是：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">define</span> (<span class="name">abs</span> x)</span><br><span class="line">  (<span class="name">cond</span> ((<span class="name">&lt;</span> x <span class="number">0</span>) (<span class="name">-</span> x))</span><br><span class="line">        (<span class="name">else</span> x)))</span><br></pre></td></tr></table></figure>
+<p>如果x小于0就返回-x，否则就返回x。</p>
+<p>还有一种写法：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">define</span> (<span class="name">abs</span> x)</span><br><span class="line">  (<span class="name">if</span> (<span class="name">&lt;</span> x <span class="number">0</span>)</span><br><span class="line">      (<span class="name">-</span> x)</span><br><span class="line">      x)</span><br></pre></td></tr></table></figure>
+<p>这里采用的是if形式。</p>
+<h3 id="逻辑复合运算符"><a href="#逻辑复合运算符" class="headerlink" title="逻辑复合运算符"></a>逻辑复合运算符</h3><p>and表达式：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">and</span> <span class="number">1</span> <span class="number">1</span>)</span><br><span class="line"><span class="number">1</span></span><br><span class="line">&gt; (<span class="name">and</span> <span class="number">1</span> <span class="number">0</span>)</span><br><span class="line"><span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>or表达式：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">or</span> <span class="number">1</span> <span class="number">1</span>)</span><br><span class="line"><span class="number">1</span></span><br><span class="line">&gt; (<span class="name">or</span> <span class="number">1</span> <span class="number">0</span>)</span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>not表达式:<br><img src="/image/15817003951342.jpg" alt=""><br>如果<e>是True，就返回False<br>如果<e>是False，就返回True。</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; (<span class="name">not</span> #t)</span><br><span class="line">#f</span><br><span class="line">&gt; (<span class="name">not</span> #f)</span><br><span class="line">#t</span><br></pre></td></tr></table></figure>
+
+<p>定义一个大于等于的过程:</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name">define</span> (<span class="name">&gt;=</span> x y)</span><br><span class="line">  (<span class="name">or</span> (<span class="name">&gt;</span> x y) (<span class="name">=</span> x y)))</span><br></pre></td></tr></table></figure>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

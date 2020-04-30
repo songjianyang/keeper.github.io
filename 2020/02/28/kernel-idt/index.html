@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="内核笔记 - IDT"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/02/28/kernel-idt/"/>
+
+
+<meta name="description" content="上次学了如何写GDT，那么IDT其实和GDT差不多，所以我就照葫芦画瓢，前半部分比较顺利，但写到后半部分就不会了，所以又学习了james先生的教程。 定义IDT结构和GDT一样，先是定义IDT的结构。 123456789101112131415&#x2F;*include&#x2F;idt.h*&#x2F;struct idt_descriptor&amp;#123;	u16 offset_low;	u16 seg;	u8 zero;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核笔记 - IDT">
+<meta property="og:url" content="http://yoursite.com/2020/02/28/kernel-idt/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="上次学了如何写GDT，那么IDT其实和GDT差不多，所以我就照葫芦画瓢，前半部分比较顺利，但写到后半部分就不会了，所以又学习了james先生的教程。 定义IDT结构和GDT一样，先是定义IDT的结构。 123456789101112131415&#x2F;*include&#x2F;idt.h*&#x2F;struct idt_descriptor&amp;#123;	u16 offset_low;	u16 seg;	u8 zero;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15828973386543.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15829015112189.jpg">
+<meta property="article:published_time" content="2020-02-28T13:34:36.254Z">
+<meta property="article:modified_time" content="2020-03-09T19:46:50.271Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15828973386543.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> 内核笔记 - IDT - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          内核笔记 - IDT
+        
+      </h1>
+
+      <time class="post-time">
+          2020-02-28
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>上次学了如何写GDT，那么IDT其实和GDT差不多，所以我就照葫芦画瓢，前半部分比较顺利，但写到后半部分就不会了，所以又学习了james先生的教程。</p>
+<h3 id="定义IDT结构"><a href="#定义IDT结构" class="headerlink" title="定义IDT结构"></a>定义IDT结构</h3><p>和GDT一样，先是定义IDT的结构。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">include/idt.h</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idt_descriptor</span>&#123;</span></span><br><span class="line">	u16 offset_low;</span><br><span class="line">	u16 seg;</span><br><span class="line">	u8 zero;</span><br><span class="line">	u8 flags;</span><br><span class="line">	u16 offset_high;</span><br><span class="line">&#125;__attribute__((packed));</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idtr_struct</span>&#123;</span></span><br><span class="line">	u16 limit;</span><br><span class="line">	u32 base;</span><br><span class="line">&#125;__attribute__((packed));</span><br></pre></td></tr></table></figure>
+
+<p>学过中断都知道，0 ~ 19号属于CPU，20 ~ 31是CPU保留的。用户只能使用32~255的中断号。</p>
+<p>定义中断处理函数。<br><img src="/image/15828973386543.jpg" alt=""></p>
+<h3 id="IDT初始化函数"><a href="#IDT初始化函数" class="headerlink" title="IDT初始化函数"></a>IDT初始化函数</h3><p>init_idt 用于初始化。<br>idt_set_descriptor 用于安装中断描述符。</p>
+<p>安装cpu的中断。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/idt.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"idt.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"string.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> <span class="title">idt_flush</span><span class="params">(u32)</span></span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idt_descriptor</span> <span class="title">idt</span>[256];</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">idtr_struct</span> <span class="title">idtr</span>;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">idt_set_descriptor</span><span class="params">(<span class="keyword">int</span> num,u32 offset,u16 seg,u8 flags)</span></span>;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_idt</span><span class="params">()</span></span>&#123;</span><br><span class="line">	idtr.limit = <span class="keyword">sizeof</span>(struct idt_descriptor) * <span class="number">256</span> - <span class="number">1</span>;</span><br><span class="line">	idtr.base = (u32)&amp;idt;</span><br><span class="line"></span><br><span class="line">	bzero(&amp;idt,<span class="keyword">sizeof</span>(struct idt_descriptor) *<span class="number">256</span>);</span><br><span class="line">	</span><br><span class="line">	idt_set_descriptor( <span class="number">0</span>, (u32)isr0,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">1</span>, (u32)isr1,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">2</span>, (u32)isr2,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">3</span>, (u32)isr3,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">4</span>, (u32)isr4,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">5</span>, (u32)isr5,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">6</span>, (u32)isr6,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">7</span>, (u32)isr7,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">8</span>, (u32)isr8,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor( <span class="number">9</span>, (u32)isr9,  <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">10</span>, (u32)isr10, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">11</span>, (u32)isr11, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">12</span>, (u32)isr12, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">13</span>, (u32)isr13, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">14</span>, (u32)isr14, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">15</span>, (u32)isr15, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">16</span>, (u32)isr16, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">17</span>, (u32)isr17, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">18</span>, (u32)isr18, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">19</span>, (u32)isr19, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">20</span>, (u32)isr20, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">21</span>, (u32)isr21, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">22</span>, (u32)isr22, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">23</span>, (u32)isr23, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">24</span>, (u32)isr24, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">25</span>, (u32)isr25, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">26</span>, (u32)isr26, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">27</span>, (u32)isr27, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">28</span>, (u32)isr28, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">29</span>, (u32)isr29, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">30</span>, (u32)isr30, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	idt_set_descriptor(<span class="number">31</span>, (u32)isr31, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">	</span><br><span class="line">	idt_flush((u32)&amp;idtr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">idt_set_descriptor</span><span class="params">(<span class="keyword">int</span> num,u32 offset,u16 seg,u8 flags)</span></span>&#123;</span><br><span class="line">	idt[num].offset_low = offset &amp; <span class="number">0xFFFF</span>;</span><br><span class="line">	idt[num].offset_high = (offset &gt;&gt; <span class="number">16</span> ) &amp;<span class="number">0xFFFF</span>;</span><br><span class="line"></span><br><span class="line">	idt[num].seg = seg;</span><br><span class="line">	idt[num].zero = <span class="number">0</span>;</span><br><span class="line">	idt[num].flags = flags;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h3 id="通用中断处理函数"><a href="#通用中断处理函数" class="headerlink" title="通用中断处理函数"></a>通用中断处理函数</h3><p>前面的代码都是之前写过的，但是写到中断处理函数这里，我只好学习James先生的代码。</p>
+<p>首先是安装idtr：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/idt_s.s</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[global idt_flush]</span><br><span class="line"></span><br><span class="line">idt_flush:</span><br><span class="line">	mov eax,[esp+<span class="number">4</span>]</span><br><span class="line">	lidt [eax]</span><br><span class="line">	ret</span><br></pre></td></tr></table></figure>
+
+<p>然后是定义每个中断号的处理函数，因为有些中断有错误代码，所以要分成两类，ISR_NOERRCODE 和 ISR_ERRCODE。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/idt_s.s</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">%macro ISR_NOERRCODE <span class="number">1</span>  ; define a macro, taking one parameter</span><br><span class="line">  [GLOBAL isr%<span class="number">1</span>]        ; %<span class="number">1</span> accesses the first parameter.</span><br><span class="line">  isr%<span class="number">1</span>:</span><br><span class="line">    cli</span><br><span class="line">    push <span class="keyword">byte</span> <span class="number">0</span></span><br><span class="line">    push <span class="keyword">byte</span> %<span class="number">1</span></span><br><span class="line">    jmp isr_common_stub</span><br><span class="line">%endmacro</span><br><span class="line"></span><br><span class="line">%macro ISR_ERRCODE <span class="number">1</span></span><br><span class="line">  [GLOBAL isr%<span class="number">1</span>]</span><br><span class="line">  isr%<span class="number">1</span>:</span><br><span class="line">    cli</span><br><span class="line">    push <span class="keyword">byte</span> %<span class="number">1</span></span><br><span class="line">    jmp isr_common_stub</span><br><span class="line">%endmacro</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ISR_NOERRCODE  <span class="number">0</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">1</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">2</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">3</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">4</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">5</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">6</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">7</span> 	</span><br><span class="line">ISR_ERRCODE    <span class="number">8</span> 	</span><br><span class="line">ISR_NOERRCODE  <span class="number">9</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">10</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">11</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">12</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">13</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">14</span> 	</span><br><span class="line">ISR_NOERRCODE <span class="number">15</span> 	</span><br><span class="line">ISR_NOERRCODE <span class="number">16</span> 	</span><br><span class="line">ISR_ERRCODE   <span class="number">17</span> 	</span><br><span class="line">ISR_NOERRCODE <span class="number">18</span> 	</span><br><span class="line">ISR_NOERRCODE <span class="number">19</span> 	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ISR_NOERRCODE <span class="number">20</span></span><br><span class="line">ISR_NOERRCODE <span class="number">21</span></span><br><span class="line">ISR_NOERRCODE <span class="number">22</span></span><br><span class="line">ISR_NOERRCODE <span class="number">23</span></span><br><span class="line">ISR_NOERRCODE <span class="number">24</span></span><br><span class="line">ISR_NOERRCODE <span class="number">25</span></span><br><span class="line">ISR_NOERRCODE <span class="number">26</span></span><br><span class="line">ISR_NOERRCODE <span class="number">27</span></span><br><span class="line">ISR_NOERRCODE <span class="number">28</span></span><br><span class="line">ISR_NOERRCODE <span class="number">29</span></span><br><span class="line">ISR_NOERRCODE <span class="number">30</span></span><br><span class="line">ISR_NOERRCODE <span class="number">31</span></span><br><span class="line"></span><br><span class="line">ISR_NOERRCODE <span class="number">255</span></span><br></pre></td></tr></table></figure>
+
+<p>James先生的代码使用了宏，分为有错误代码和无错误代码，有错误代码的会将错误代码push到栈里，它们最后都使用同一个处理程序isr_common_stub。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/idt_s.s</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">[EXTERN isr_handler]</span><br><span class="line"></span><br><span class="line">; This is our common ISR stub. It saves the processor state, sets</span><br><span class="line">; up <span class="keyword">for</span> kernel mode segments, calls the C-level fault handler,</span><br><span class="line">; <span class="keyword">and</span> finally restores the <span class="built_in">stack</span> frame.</span><br><span class="line">isr_common_stub:</span><br><span class="line">   pusha                    ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax</span><br><span class="line"></span><br><span class="line">   mov ax, ds               ; Lower <span class="number">16</span>-bits of eax = ds.</span><br><span class="line">   push eax                 ; save the data segment descriptor</span><br><span class="line"></span><br><span class="line">   mov ax, <span class="number">0x10</span>  ; load the kernel data segment descriptor</span><br><span class="line">   mov ds, ax</span><br><span class="line">   mov es, ax</span><br><span class="line">   mov fs, ax</span><br><span class="line">   mov gs, ax</span><br><span class="line"></span><br><span class="line">   call isr_handler</span><br><span class="line"></span><br><span class="line">   pop eax        ; reload the original data segment descriptor</span><br><span class="line">   mov ds, ax</span><br><span class="line">   mov es, ax</span><br><span class="line">   mov fs, ax</span><br><span class="line">   mov gs, ax</span><br><span class="line"></span><br><span class="line">   popa                     ; Pops edi,esi,ebp...</span><br><span class="line">   add esp, <span class="number">8</span>     ; Cleans up the pushed error code <span class="keyword">and</span> pushed ISR number</span><br><span class="line">   sti</span><br><span class="line">   iret           ; pops <span class="number">5</span> things at once: CS, EIP, EFLAGS, SS, <span class="keyword">and</span> ESP</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的意思大概就是，先保存现场，然后加载内核的数据段，然后调用isr_handler，这个函数就是中断处理函数，可以根据情况自由实现。</p>
+<p>最后是恢复原来的数据段。之所以有保存和恢复这个步骤，是为了兼容以后在用户段发生中断的情况。</p>
+<p>最后是isr_handler：</p>
+<p>它的作用就是打印当前的中断号。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/isr.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">registers</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">   u32 ds;                  <span class="comment">// Data segment selector</span></span><br><span class="line">   u32 edi, esi, ebp, esp, ebx, edx, ecx, eax; <span class="comment">// Pushed by pusha.</span></span><br><span class="line">   u32 int_no, err_code;    <span class="comment">// Interrupt number and error code (if applicable)</span></span><br><span class="line">   u32 eip, cs, eflags, useresp, ss; <span class="comment">// Pushed by the processor automatically.</span></span><br><span class="line">&#125; <span class="keyword">registers_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr_handler</span><span class="params">(<span class="keyword">registers_t</span> regs)</span></span>&#123;</span><br><span class="line">	printk(<span class="string">"recieved interrupt: %d\n"</span>,regs.int_no);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于我需要一些操作界面和字符串的辅助函数，我自己写了一部分，比如strlen、memcpy等，也从其它项目中copy了一部分，比如printk，我暂时先把它当做工具函数，拿过来解决眼前的问题，因为打印各种字符串并不是内核的重点，以后再去学习它的实现也不迟。</p>
+<h3 id="end"><a href="#end" class="headerlink" title="end"></a>end</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/isr.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"gdt.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"console.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"idt.h"</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">kmain</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	console_clear();</span><br><span class="line"></span><br><span class="line">	init_gdt();</span><br><span class="line">	init_idt();</span><br><span class="line">	</span><br><span class="line">	printk(<span class="string">"Hello,kernel;\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">asm</span> <span class="title">volatile</span> <span class="params">(<span class="string">"int $0x3"</span>)</span></span>; <span class="comment">//调用中断</span></span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/image/15829015112189.jpg" alt=""></p>
+<p>参考资料：<br><a href="http://wiki.0xffffff.org/posts/hurlex-7.html" target="_blank" rel="noopener">x86架构操作系统内核的实现</a><br><a href="http://www.jamesmolloy.co.uk/tutorial_html/4.-The%20GDT%20and%20IDT.html" target="_blank" rel="noopener">JamesM’s kernel development tutorials</a></p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

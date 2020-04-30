@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="内核笔记 - IRQs and PIT"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/03/04/kernel-irqs-pit/"/>
+
+
+<meta name="description" content="安装好了IDT之后，接下来就来实现中断请求。 外设中断由中断控制芯片8259A进行控制，想要了解其中的原理可以看这篇文章：保护模式下的 8259A芯片编程 及中断处理探究 初始化8259A在init_idt()函数开头加入初始化代码，用来初始化设置8259A芯片。 1234567891011121314151617181920212223&#x2F;*idt&#x2F;idt.c*&#x2F;void init_idt()&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核笔记 - IRQs and PIT">
+<meta property="og:url" content="http://yoursite.com/2020/03/04/kernel-irqs-pit/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="安装好了IDT之后，接下来就来实现中断请求。 外设中断由中断控制芯片8259A进行控制，想要了解其中的原理可以看这篇文章：保护模式下的 8259A芯片编程 及中断处理探究 初始化8259A在init_idt()函数开头加入初始化代码，用来初始化设置8259A芯片。 1234567891011121314151617181920212223&#x2F;*idt&#x2F;idt.c*&#x2F;void init_idt()&amp;#">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15832577426713.jpg">
+<meta property="article:published_time" content="2020-03-03T16:53:41.050Z">
+<meta property="article:modified_time" content="2020-03-09T20:56:30.820Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15832577426713.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> 内核笔记 - IRQs and PIT - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          内核笔记 - IRQs and PIT
+        
+      </h1>
+
+      <time class="post-time">
+          2020-03-04
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>安装好了IDT之后，接下来就来实现中断请求。</p>
+<p>外设中断由中断控制芯片8259A进行控制，想要了解其中的原理可以看这篇文章：<a href="https://wenku.baidu.com/view/dcbef6140b4e767f5acfcef3.html" target="_blank" rel="noopener">保护模式下的 8259A芯片编程 及中断处理探究</a></p>
+<h3 id="初始化8259A"><a href="#初始化8259A" class="headerlink" title="初始化8259A"></a>初始化8259A</h3><p>在init_idt()函数开头加入初始化代码，用来初始化设置8259A芯片。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/idt.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_idt</span><span class="params">()</span></span>&#123;</span><br><span class="line">outb(<span class="number">0x20</span>, <span class="number">0x11</span>);</span><br><span class="line">outb(<span class="number">0xA0</span>, <span class="number">0x11</span>);</span><br><span class="line">outb(<span class="number">0x21</span>, <span class="number">0x20</span>);</span><br><span class="line">outb(<span class="number">0xA1</span>, <span class="number">0x28</span>);</span><br><span class="line">outb(<span class="number">0x21</span>, <span class="number">0x04</span>);</span><br><span class="line">outb(<span class="number">0xA1</span>, <span class="number">0x02</span>);</span><br><span class="line">outb(<span class="number">0x21</span>, <span class="number">0x01</span>);</span><br><span class="line">outb(<span class="number">0xA1</span>, <span class="number">0x01</span>);</span><br><span class="line">outb(<span class="number">0x21</span>, <span class="number">0x0</span>);</span><br><span class="line">outb(<span class="number">0xA1</span>, <span class="number">0x0</span>);	</span><br><span class="line"></span><br><span class="line">······</span><br><span class="line"></span><br><span class="line"><span class="comment">//注意安装irq的描述符</span></span><br><span class="line">idt_set_descriptor(<span class="number">32</span>, (u32)irq0, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">idt_set_descriptor(<span class="number">33</span>, (u32)irq1, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">idt_set_descriptor(<span class="number">34</span>, (u32)irq2, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br><span class="line">······</span><br><span class="line">idt_set_descriptor(<span class="number">47</span>, (u32)irq15, <span class="number">0x08</span>, <span class="number">0x8E</span>);</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="定义IRQ处理函数"><a href="#定义IRQ处理函数" class="headerlink" title="定义IRQ处理函数"></a>定义IRQ处理函数</h3><p>声明IRQ函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">include/idt.h</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq0</span><span class="params">()</span></span>;		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq1</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq2</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq3</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq4</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq5</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq6</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq7</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq8</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq9</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq10</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq11</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq12</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq13</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq14</span><span class="params">()</span></span>; 		</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq15</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+<p>和安装isr差不多，使用了宏。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line">idt&#x2F;idt_s.s</span><br><span class="line">*&#x2F;</span><br><span class="line">%macro IRQ 2</span><br><span class="line">[GLOBAL irq%1]</span><br><span class="line">irq%1:</span><br><span class="line">	cli</span><br><span class="line">	push 0</span><br><span class="line">	push %2</span><br><span class="line">	jmp irq_common_stub</span><br><span class="line">%endmacro</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">IRQ   0,	   32</span><br><span class="line">IRQ   1,    33	</span><br><span class="line">IRQ   2,    34	</span><br><span class="line">IRQ   3,    35	</span><br><span class="line">IRQ   4,    36	</span><br><span class="line">IRQ   5,    37	</span><br><span class="line">IRQ   6,    38	</span><br><span class="line">IRQ   7,    39	</span><br><span class="line">IRQ   8,    40	</span><br><span class="line">IRQ   9,    41	</span><br><span class="line">IRQ  10,    42	</span><br><span class="line">IRQ  11,    43	</span><br><span class="line">IRQ  12,    44</span><br><span class="line">IRQ  13,    45</span><br><span class="line">IRQ  14,    46	</span><br><span class="line">IRQ  15,    47	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[GLOBAL irq_common_stub]</span><br><span class="line">[EXTERN irq_handler]</span><br><span class="line"></span><br><span class="line">irq_common_stub:</span><br><span class="line">	pusha                    ; pushes edi, esi, ebp, esp, ebx, edx, ecx, eax</span><br><span class="line">	</span><br><span class="line">	mov ax, ds</span><br><span class="line">	push eax                 ; 保存数据段描述符</span><br><span class="line">	</span><br><span class="line">	mov ax, 0x10  		 ; 加载内核数据段描述符</span><br><span class="line">	mov ds, ax</span><br><span class="line">	mov es, ax</span><br><span class="line">	mov fs, ax</span><br><span class="line">	mov gs, ax</span><br><span class="line">	mov ss, ax</span><br><span class="line">	</span><br><span class="line">	push esp</span><br><span class="line">	call irq_handler</span><br><span class="line">	add esp, 4</span><br><span class="line">	</span><br><span class="line">	pop ebx                   ; 恢复原来的数据段描述符</span><br><span class="line">	mov ds, bx</span><br><span class="line">	mov es, bx</span><br><span class="line">	mov fs, bx</span><br><span class="line">	mov gs, bx</span><br><span class="line">	mov ss, bx</span><br><span class="line">	</span><br><span class="line">	popa                     ; Pops edi,esi,ebp...</span><br><span class="line">	add esp, 8     		 ; 清理压栈的 错误代码 和 ISR 编号</span><br><span class="line">	iret          		 ; 出栈 CS, EIP, EFLAGS, SS, ESP</span><br><span class="line">.end:</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="IRQ处理函数实现"><a href="#IRQ处理函数实现" class="headerlink" title="IRQ处理函数实现"></a>IRQ处理函数实现</h3><p>这段代码当时我不太理解，看了一天给我整崩溃了。</p>
+<p>irq_handler的功能就是如果请求号&gt;40表示是从片控制的，它是一个EOI消息，会将从片重置，目的就是清空8259A中的ISR的位。</p>
+<p>主片每次都会重置，所以一定会执行 outb(0x20,0x20);</p>
+<p>最后触发具体的中断处理函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">idt/isr.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">isr_t</span> interrupt_handlers[<span class="number">256</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">isr_handler</span><span class="params">(<span class="keyword">registers_t</span> *regs)</span></span>&#123;</span><br><span class="line">	printk(<span class="string">"recieved interrupt: %d\n"</span>,regs-&gt;int_no);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">irq_handler</span><span class="params">(<span class="keyword">registers_t</span> *regs)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(regs-&gt;int_no &gt;= <span class="number">40</span>)&#123;</span><br><span class="line">		outb(<span class="number">0xA0</span>,<span class="number">0x20</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	outb(<span class="number">0x20</span>,<span class="number">0x20</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>(interrupt_handlers[regs-&gt;int_no] != <span class="number">0</span>)&#123;</span><br><span class="line">		interrupt_handlers[regs-&gt;int_no](regs);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">register_interrupt_handler</span><span class="params">(u8 n,<span class="keyword">isr_t</span> handler)</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	interrupt_handlers[n] = handler;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>register_interrupt_handler 用来安装中断号对应的处理函数。</p>
+<h3 id="PIT-时钟中断"><a href="#PIT-时钟中断" class="headerlink" title="PIT 时钟中断"></a>PIT 时钟中断</h3><p>PIT就是 programmable interval timer的缩写，它连接到了IRQ0。</p>
+<p>原理请参考：<a href="https://wiki.osdev.org/Programmable_Interval_Timer" target="_blank" rel="noopener">Programmable Interval Timer</a></p>
+<p>init_timer的作用就是，使IRQ0对应timer_callback这个处理函数，然后设置好PIT的频率和工作模式。</p>
+<p>之后内核会根据频率，调用timer_callback，每次调用一次变量i就+1。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">timer/timer.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">u32 i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">timer_callback</span><span class="params">(<span class="keyword">registers_t</span> regs)</span></span>&#123;</span><br><span class="line">	i++;</span><br><span class="line">	printk(<span class="string">"Tick: %d\n"</span>,i);</span><br><span class="line">&#125;</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_timer</span><span class="params">(u32 frequency)</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	register_interrupt_handler(IRQ0,timer_callback);</span><br><span class="line">	printk(<span class="string">"222"</span>);</span><br><span class="line">	</span><br><span class="line">	u32 divisor = <span class="number">1193180</span> / frequency;</span><br><span class="line"></span><br><span class="line">	outb(<span class="number">0x43</span>,<span class="number">0x36</span>);</span><br><span class="line">	u8 low = (u8)(divisor &amp; <span class="number">0xFF</span>);</span><br><span class="line">	u8 high = (u8)((divisor &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xFF</span>);</span><br><span class="line"></span><br><span class="line">	outb(<span class="number">0x40</span>,low);</span><br><span class="line">	outb(<span class="number">0x40</span>,high);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行效果：<br><img src="/image/15832577426713.jpg" alt=""></p>
+<p>参考资料：<br><a href="http://wiki.0xffffff.org/posts/hurlex-7.html" target="_blank" rel="noopener">x86架构操作系统内核的实现</a><br><a href="http://www.jamesmolloy.co.uk/" target="_blank" rel="noopener">JamesM’s kernel development tutorials</a></p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

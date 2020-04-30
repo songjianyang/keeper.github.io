@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="内核笔记 - 分页"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/03/09/kernel-paging/"/>
+
+
+<meta name="description" content="我老早就理解了分页的原理，不过真正落实到具体代码的时候，仍然花了好大一番功夫。我发现试图从代码中理解思路是非常困难的。因为正常的流程是先有思路，后有代码，假如一个完全不理解分页的人，试图通过阅读代码学会它，这几乎是找罪受。 即使我理解了分页，在我学习James的这篇[Paging]教程时，仍然花了好大的劲，最后不得不逼我用出GDB + IDA进行调试，这才搞懂了它的代码思路。 这篇文章是我个人的笔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内核笔记 - 分页">
+<meta property="og:url" content="http://yoursite.com/2020/03/09/kernel-paging/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="我老早就理解了分页的原理，不过真正落实到具体代码的时候，仍然花了好大一番功夫。我发现试图从代码中理解思路是非常困难的。因为正常的流程是先有思路，后有代码，假如一个完全不理解分页的人，试图通过阅读代码学会它，这几乎是找罪受。 即使我理解了分页，在我学习James的这篇[Paging]教程时，仍然花了好大的劲，最后不得不逼我用出GDB + IDA进行调试，这才搞懂了它的代码思路。 这篇文章是我个人的笔">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15837873178692.jpg">
+<meta property="article:published_time" content="2020-03-08T19:28:42.963Z">
+<meta property="article:modified_time" content="2020-03-11T19:49:20.403Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15837873178692.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> 内核笔记 - 分页 - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          内核笔记 - 分页
+        
+      </h1>
+
+      <time class="post-time">
+          2020-03-09
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>我老早就理解了分页的原理，不过真正落实到具体代码的时候，仍然花了好大一番功夫。我发现试图从代码中理解思路是非常困难的。因为正常的流程是先有思路，后有代码，假如一个完全不理解分页的人，试图通过阅读代码学会它，这几乎是找罪受。</p>
+<p>即使我理解了分页，在我学习James的这篇[<a href="http://www.jamesmolloy.co.uk/tutorial_html/6.-Paging.html" target="_blank" rel="noopener">Paging</a>]教程时，仍然花了好大的劲，最后不得不逼我用出GDB + IDA进行调试，这才搞懂了它的代码思路。</p>
+<p>这篇文章是我个人的笔记，所以不会去从头讲原理，只讲解实现分页代码的主要部分，想学原理可以看James的教程。<br>alloc_address</p>
+<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><p>placement_address 指向 SECTIONS 的最后，也就是bss段的后面，该位置属于未分配的内存。<br>假如placement_address 现在指向0x180000，我们现在需要获得一个0x80大小的内存，那么alloc_address_int就会返回0x180000，之后把placement_address 加上0x80，变成0x180080，等待下一次分配。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">heap/kheap.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function">u32 <span class="title">alloc_address_int</span><span class="params">(u32 <span class="built_in">size</span>,<span class="keyword">int</span> align,u32 *phys)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(align == <span class="number">1</span> &amp;&amp; (placement_address &amp; <span class="number">0xFFFFF000</span>))&#123;</span><br><span class="line">		placement_address &amp;= <span class="number">0xFFFFF000</span>;</span><br><span class="line">		placement_address += <span class="number">0x1000</span>;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(phys)&#123;</span><br><span class="line">		*phys = placement_address;</span><br><span class="line">	&#125;</span><br><span class="line">	u32 tmp = placement_address;</span><br><span class="line">	placement_address += <span class="built_in">size</span>;</span><br><span class="line">	<span class="keyword">return</span> tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="页表和页目录"><a href="#页表和页目录" class="headerlink" title="页表和页目录"></a>页表和页目录</h3><p>page 就是页目录项和页表项的结构，其中涉及到各种位，我保留了英文的注释，想具体了解也可看文档。<br>page_table 是页表，里面可以存储1024个页表项，每个页表项4字节。<br>page_directory 是页目录，保存了页表的地址，还有页目录本身的物理地址。</p>
+<p>代码里需要说明的位置我加上了中文注释。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">include/paging.h</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">page</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    u32 present    : <span class="number">1</span>;   <span class="comment">// Page present in memory</span></span><br><span class="line">    u32 rw         : <span class="number">1</span>;   <span class="comment">// Read-only if clear, readwrite if set</span></span><br><span class="line">    u32 user       : <span class="number">1</span>;   <span class="comment">// Supervisor level only if clear</span></span><br><span class="line">    u32 accessed   : <span class="number">1</span>;   <span class="comment">// Has the page been accessed since last refresh?</span></span><br><span class="line">    u32 dirty      : <span class="number">1</span>;   <span class="comment">// Has the page been written to since last refresh?</span></span><br><span class="line">    u32 unused     : <span class="number">7</span>;   <span class="comment">// Amalgamation of unused and reserved bits</span></span><br><span class="line">    u32 frame      : <span class="number">20</span>;  <span class="comment">// Frame address (shifted right 12 bits)</span></span><br><span class="line">&#125; <span class="keyword">page_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">page_table</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">page_t</span> pages[<span class="number">1024</span>];</span><br><span class="line">&#125; <span class="keyword">page_table_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">page_directory</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">       页表指针数组，只是为了方便操作。</span></span><br><span class="line"><span class="comment">    **/</span></span><br><span class="line">    <span class="keyword">page_table_t</span> *tables[<span class="number">1024</span>];</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">        tablesPhysical就是页目录项，指向页表的物理地址，最后会将tablesPhysical放到CR3寄存器，表示页目录的起始地址。</span></span><br><span class="line"><span class="comment">    **/</span></span><br><span class="line">    u32 tablesPhysical[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    保存了当前页目录的物理地址。</span></span><br><span class="line"><span class="comment">    当真正开启分页机制后，一切的地址都会被视为虚拟地址，那么此时要新增页表的时候，我们必须得知道页目录的物理地址，故将其保存在自己的页目录内。</span></span><br><span class="line"><span class="comment">    **/</span></span><br><span class="line">    u32 physicalAddr;</span><br><span class="line">&#125; <span class="keyword">page_directory_t</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Frame分配"><a href="#Frame分配" class="headerlink" title="Frame分配"></a>Frame分配</h3><p>页帧的分配，采用了一种数据结构叫bitset，就是用一连串的bit位，比如01011110，每一个位对应一个页帧，如果是1表示该页帧已被分配，如果是0表示未分配。bit串的第1位，对应物理地址0x0000，第2位对应0x1000，以此类推。</p>
+<p>下面只贴出主要代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">page/paging.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">set_frame</span><span class="params">(u32 frame_addr)</span></span>&#123;</span><br><span class="line">	u32 frame = frame_addr / <span class="number">0x1000</span>;</span><br><span class="line">	u32 idx = INDEX_FROM_BIT(frame);</span><br><span class="line">	u32 off = OFFSET_FROM_BIT(frame);</span><br><span class="line">	frames[idx] |= (<span class="number">0x1</span> &lt;&lt; off);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">······</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> u32 <span class="title">first_frame</span><span class="params">()</span></span>&#123;</span><br><span class="line">	u32 i, j;</span><br><span class="line">	<span class="keyword">for</span>(i=<span class="number">0</span>; i &lt; INDEX_FROM_BIT(nframes);i++)&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span>(frames[i] != <span class="number">0xFFFFFFFF</span>)&#123;</span><br><span class="line">			<span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; <span class="number">32</span>; j++)	&#123;</span><br><span class="line">				u32 toTest = <span class="number">0x1</span> &lt;&lt; j;</span><br><span class="line">				<span class="keyword">if</span>( !(frames[i]&amp;toTest))&#123;</span><br><span class="line">					<span class="keyword">return</span> i *<span class="number">4</span>*<span class="number">8</span>+j;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">alloc_frame</span><span class="params">(<span class="keyword">page_t</span> *page, <span class="keyword">int</span> is_kernel, <span class="keyword">int</span> is_writeable)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (page-&gt;frame != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        u32 idx = first_frame();</span><br><span class="line">        <span class="keyword">if</span> (idx == (u32)<span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            printk(<span class="string">"No free frames!"</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        set_frame(idx*<span class="number">0x1000</span>);</span><br><span class="line">        page-&gt;present = <span class="number">1</span>;</span><br><span class="line">        page-&gt;rw = (is_writeable)?<span class="number">1</span>:<span class="number">0</span>;</span><br><span class="line">        page-&gt;user = (is_kernel)?<span class="number">0</span>:<span class="number">1</span>;</span><br><span class="line">        page-&gt;frame = idx;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>set_frame 表示将指向的bit位置1。<br>first_frame 用于从bit串中寻找第一个能用的页帧。<br>alloc_frame 用于将可用的页帧地址写入到页表项中。</p>
+<h3 id="初始化分页"><a href="#初始化分页" class="headerlink" title="初始化分页"></a>初始化分页</h3><p>初始化函数，展示了开启分页从头到尾的流程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">page/paging.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">initialise_paging</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 表示物理内存最大是0x1000000。</span></span><br><span class="line">	u32 mem_end_page = <span class="number">0x1000000</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 计算一共有多少个页帧，每个页帧4kb大小，所以除以0x1000。</span></span><br><span class="line">	<span class="comment">// INDEX_FROM_BIT 计算需要多少个bit位。</span></span><br><span class="line">	nframes = mem_end_page / <span class="number">0x1000</span>;</span><br><span class="line">	frames = (u32*)alloc_address(INDEX_FROM_BIT(nframes));</span><br><span class="line">	<span class="built_in">memset</span>(frames,<span class="number">0</span>,INDEX_FROM_BIT(nframes));</span><br><span class="line"></span><br><span class="line">     <span class="comment">//分配页目录。</span></span><br><span class="line">	kernel_directory = (<span class="keyword">page_directory_t</span>*)alloc_address_a(<span class="keyword">sizeof</span>(<span class="keyword">page_directory_t</span>));</span><br><span class="line">	<span class="built_in">memset</span>(kernel_directory, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">page_directory_t</span>));</span><br><span class="line">	current_directory = kernel_directory;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// placement_address始终指向已使用内存的最后，所以要将已经使用的这些内存，在页目录和页表中分配好。</span></span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(i &lt; placement_address)&#123;</span><br><span class="line">		alloc_frame(get_page(i,<span class="number">1</span>,kernel_directory),<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">		i += <span class="number">0x1000</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//当出现页故障的时候，会发起14号中断，然后调用page_fault函数。</span></span><br><span class="line">	register_interrupt_handler(<span class="number">14</span>,page_fault);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//开启分页。</span></span><br><span class="line">	switch_page_directory(kernel_directory);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后一个比较重要的函数get_page，它用来分配一个页表，并将这个页表的指针写进页目录项。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">page/paging.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">page_t</span> *<span class="title">get_page</span><span class="params">(u32 address, <span class="keyword">int</span> make, <span class="keyword">page_directory_t</span> *dir)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Turn the address into an index.</span></span><br><span class="line">    address /= <span class="number">0x1000</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Find the page table containing this address.</span></span><br><span class="line">    <span class="comment">// 计算页表在页目录中的索引。</span></span><br><span class="line">    u32 table_idx = address / <span class="number">1024</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (dir-&gt;tables[table_idx]) <span class="comment">// 如果该页表已经分配。</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> &amp;dir-&gt;tables[table_idx]-&gt;pages[address%<span class="number">1024</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(make)</span><br><span class="line">    &#123;</span><br><span class="line">        u32 tmp;</span><br><span class="line">        dir-&gt;tables[table_idx] = (<span class="keyword">page_table_t</span>*)alloc_address_ap(<span class="keyword">sizeof</span>(<span class="keyword">page_table_t</span>), &amp;tmp);</span><br><span class="line">		<span class="built_in">memset</span>(dir-&gt;tables[table_idx], <span class="number">0</span>, <span class="number">1024</span>*<span class="number">4</span>);</span><br><span class="line">        dir-&gt;tablesPhysical[table_idx] = tmp | <span class="number">0x7</span>; <span class="comment">// PRESENT, RW, US.</span></span><br><span class="line">        <span class="keyword">return</span> &amp;dir-&gt;tables[table_idx]-&gt;pages[address%<span class="number">1024</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>最后检验一下，功能的可靠性，我们先初始化并开启分页机制，然后尝试访问未分配的虚拟地址0xA0000000，造成页故障。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">init/kernel.c</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">kmain</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	console_clear();</span><br><span class="line"></span><br><span class="line">	init_gdt();</span><br><span class="line">	init_idt();</span><br><span class="line"></span><br><span class="line">	printk(<span class="string">"Hello,kernel;\n"</span>);</span><br><span class="line"></span><br><span class="line">	init_timer(<span class="number">200</span>);</span><br><span class="line">	<span class="comment">//asm volatile ("sti");</span></span><br><span class="line">	initialise_paging();</span><br><span class="line">	u32 *ptr = (u32*)<span class="number">0xA0000000</span>;</span><br><span class="line">	u32 do_page_fault = *ptr;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>成功触发页故障，并调用了我们写好的page_fault函数。<br><img src="/image/15837873178692.jpg" alt=""></p>
+<p>参考资料：<br><a href="http://www.jamesmolloy.co.uk/" target="_blank" rel="noopener">JamesM’s kernel development tutorials</a></p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

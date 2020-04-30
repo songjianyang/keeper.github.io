@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="编译原理笔记 - 解释器"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/03/21/compiler-interpreter/"/>
+
+
+<meta name="description" content="只要能通过语法分析得到抽象语法树，程序的执行就简单了。解释器只需从抽象语法树的根节点开始遍历该树直至叶节点，并计算各节点的内容即可。这就是解释器的基本实现原理。 eval方法说白了，就是给每个节点都定义一个eval方法，用于计算出当前节点的值。比如当前节点是一个表达式，它的eval方法就会递归调用子节点的eval方法。而且不同类型的节点，对eval的实现有不同的定义。 一个算式 113 + x *">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译原理笔记 - 解释器">
+<meta property="og:url" content="http://yoursite.com/2020/03/21/compiler-interpreter/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="只要能通过语法分析得到抽象语法树，程序的执行就简单了。解释器只需从抽象语法树的根节点开始遍历该树直至叶节点，并计算各节点的内容即可。这就是解释器的基本实现原理。 eval方法说白了，就是给每个节点都定义一个eval方法，用于计算出当前节点的值。比如当前节点是一个表达式，它的eval方法就会递归调用子节点的eval方法。而且不同类型的节点，对eval的实现有不同的定义。 一个算式 113 + x *">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15847924422612.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15847926116658.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15847936223483.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15847968905781.jpg">
+<meta property="article:published_time" content="2020-03-21T12:01:27.588Z">
+<meta property="article:modified_time" content="2020-03-21T13:21:52.896Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15847924422612.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> 编译原理笔记 - 解释器 - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          编译原理笔记 - 解释器
+        
+      </h1>
+
+      <time class="post-time">
+          2020-03-21
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>只要能通过语法分析得到抽象语法树，程序的执行就简单了。解释器只需从抽象语法树的根节点开始遍历该树直至叶节点，并计算各节点的内容即可。这就是解释器的基本实现原理。</p>
+<h3 id="eval方法"><a href="#eval方法" class="headerlink" title="eval方法"></a>eval方法</h3><p>说白了，就是给每个节点都定义一个eval方法，用于计算出当前节点的值。比如当前节点是一个表达式，它的eval方法就会递归调用子节点的eval方法。<br>而且不同类型的节点，对eval的实现有不同的定义。</p>
+<p>一个算式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">13 + x * 2</span><br></pre></td></tr></table></figure>
+<p>+运算符对应的eval方法计算流程：<br><img src="/image/15847924422612.jpg" alt=""></p>
+<p><img src="/image/15847926116658.jpg" alt=""></p>
+<ul>
+<li>想要计算出这个算式的值，首先会调用 + 运算符的eval方法，然后会调用left().eval(env) 用于获取左侧节点的值，也就是13。</li>
+<li>接着调用右侧节点，返回 x * 2的值。细分一下，因为它是一个* 运算符，其内部和 + 运算符的eval差不多，会依次调用左右节点，并返回乘法运算结果。</li>
+<li>最后 + 节点的eval，将左右节点的值相加并返回。</li>
+<li>另外，eval里的env参数是环境对象，它用来记录变量名称和值的对应关系。（类似Python的字典）</li>
+</ul>
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p><img src="/image/15847936223483.jpg" alt=""></p>
+<p>环境对象通过哈希表为变量的名称与值建立了对应关系。put 方法用于添加新的名值对，get 方法则能够以名称为键搜索哈希表。</p>
+<h3 id="各种类型的eval"><a href="#各种类型的eval" class="headerlink" title="各种类型的eval"></a>各种类型的eval</h3><p>作者用了一个叫GluonJ的系统，用来给各种节点类添加eval，这么做的目的是将eval和节点类分离，都写到一个java文件内方便管理。其实可以不用，直接在节点类源码中添加eval也行。</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><p>抽象语法树中表示整型字面量的叶节点是一个Number对象，它的eval返回与之对应的整型字面量。</p>
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>用来表示变量名的叶节点是Name对象，它eval方法将通过env环境，找到该变量的值。</p>
+<h3 id="-2"><a href="#-2" class="headerlink" title=""></a></h3><p>单目减法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- 23</span><br></pre></td></tr></table></figure>
+<p>单目减法运算表达式的节点对象是一个 Negative 类的对象。该节点有一个子节点，用来表示减号右侧的子表达式。operand方法能够获得这一子节点。</p>
+<h3 id="-3"><a href="#-3" class="headerlink" title=""></a></h3><p>含有 = 运算符的赋值表达式是一个例外，它不会递归调用子节点的 eval 方法。双目运算符的节点对象是一个 BinaryExpr 类的对象BinaryExpr 类的 eval 方法在遇到 = 运算符时将做特殊处理。</p>
+<h3 id="-4"><a href="#-4" class="headerlink" title=""></a></h3><p>赋值表达式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; 7</span><br></pre></td></tr></table></figure>
+<p>右侧的值可以通过eval计算得到，左侧不行。因为左侧值的eval方法会返回变量a的当前值。左侧值需要一种名为L-value的特殊表达式计算。计算得到的左值将更新env环境中的数据。如果赋值表达式左侧不是一个变量，将会报错。</p>
+<h3 id="-5"><a href="#-5" class="headerlink" title=""></a></h3><p>IfStmnt 类与 WhileStmnt 类的 eval 方法。代码块的计算结果就是最后执行的语句的计算结果。</p>
+<p>以IfStmnt为例，它将首先调用 condition 方法，对返回的子节点递归调用 eval 方法。最终得到的返回值即是 if 语句中条件表达式的结算结果（就是条件判断的部分）。根据该结果选择对应的代码块，调用所执行代码块的eval。</p>
+<h3 id="测试解释器"><a href="#测试解释器" class="headerlink" title="测试解释器"></a>测试解释器</h3><p><img src="/image/15847968905781.jpg" alt=""></p>
+<p>在程序代码之后将显示多行计算结果。之所以会这样，是因为每一条语句都会在执行后输出结果。第 3 行显示的是整个 while 语句的计算结果。最后一行是 sum 的值，即 1 至 9 相加的和。</p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

