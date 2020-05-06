@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Frigate 3.36 - Buffer Overflow"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/05/06/Frigate-buffer-overflow/"/>
+
+
+<meta name="description" content="https:&#x2F;&#x2F;www.exploit-db.com&#x2F;exploits&#x2F;48415 分析 Attach Frigate process use windbg  Generate hundreds of ‘A’ characters Copy the contents to clipboard Open Frigate3 then go to Disk -&gt; Find Computer  Pa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Frigate 3.36 - Buffer Overflow">
+<meta property="og:url" content="http://yoursite.com/2020/05/06/Frigate-buffer-overflow/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="https:&#x2F;&#x2F;www.exploit-db.com&#x2F;exploits&#x2F;48415 分析 Attach Frigate process use windbg  Generate hundreds of ‘A’ characters Copy the contents to clipboard Open Frigate3 then go to Disk -&gt; Find Computer  Pa">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15887385962213.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15887365958082.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15887368243494.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15887366583042.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15887371742869.jpg">
+<meta property="article:published_time" content="2020-05-06T03:36:06.174Z">
+<meta property="article:modified_time" content="2020-05-06T04:53:50.095Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15887385962213.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> Frigate 3.36 - Buffer Overflow - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Frigate 3.36 - Buffer Overflow
+        
+      </h1>
+
+      <time class="post-time">
+          2020-05-06
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p><a href="https://www.exploit-db.com/exploits/48415" target="_blank" rel="noopener">https://www.exploit-db.com/exploits/48415</a></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><ol>
+<li>Attach Frigate process use windbg </li>
+<li>Generate hundreds of ‘A’ characters</li>
+<li>Copy the contents to clipboard</li>
+<li>Open Frigate3 then go to Disk -&gt; Find Computer </li>
+<li>Paste the contents to computer name  </li>
+<li>Crash</li>
+</ol>
+<p><img src="/image/15887385962213.jpg" alt=""></p>
+<p>Crash at 4000e8e1.<br><img src="/image/15887365958082.jpg" alt=""></p>
+<p>Because <code>rep movs</code> copy [esi] to [edi], but the data in [esi] is too long, so when edi points to a non-writable memory area, is triggers a crash.<br><img src="/image/15887368243494.jpg" alt=""></p>
+<p><code>rep movs</code> in rtl60!SysutilsStrLCopy.</p>
+<p>Use IDA to decompile rtl60.bpl.<br>edi is result, esi is a2.<br><img src="/image/15887366583042.jpg" alt=""></p>
+<p>Observe what happened use conditional breakpoints.<br><code>bp 4000e8e1  &quot;.if(poi(0x0012ecea)=0x41414141){};.else{gc;}&quot;</code></p>
+<p><img src="/image/15887371742869.jpg" alt=""></p>
+<p>ecx is <code>len(payload) / 4</code>, <code>rep movs</code> will copy 0xbf4 times, 4 bytes at a time.</p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>
