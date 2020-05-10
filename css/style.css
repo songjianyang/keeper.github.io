@@ -635,12 +635,14 @@ p {
       padding: 7px;
       font-size: 17px;
       font-family: "Open Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", "Microsoft Jhenghei", sans-serif;
-      background: #f5f5d5; }
+      background: #f5f5d5;
+      word-spacing: 5px; }
     .post .post-content code {
       padding: 1px 5px 0px;
       color: #e4257e;
       border: 1px solid #e8e8e8;
-      border-radius: 3px; }
+      border-radius: 3px;
+      word-spacing: 5px; }
     .post .post-content .highlight {
       margin: 1em 0; }
       .post .post-content .highlight table {
