@@ -45,7 +45,7 @@
 <meta property="og:image" content="http://yoursite.com/image/15891083745190.jpg">
 <meta property="og:image" content="http://yoursite.com/image/15891091159702.jpg">
 <meta property="article:published_time" content="2020-05-10T07:11:07.566Z">
-<meta property="article:modified_time" content="2020-05-14T08:22:39.393Z">
+<meta property="article:modified_time" content="2020-05-14T08:35:50.961Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/image/15891068174082.jpg">
 
@@ -165,7 +165,7 @@
 <p>修改后的代码： <a href="/image/mona.py">mona.py</a>。 安装方法：将 mona.py 放到 Immunity Debugger 的 PyCommands 目录。</p>
 <p>命令：<code>!mona rop -cp nonull  -m *.dll</code></p>
 <p><img src="/image/15891080829182.jpg" alt=""></p>
-<p>这段ROP的作用就是调用 VirtualAlloc 开辟一段有具执行权限的区域，然后将shellcode放到这段区域内执行。（我暂时还没有仔细分析这段rop chain，后续我会补充）</p>
+<p>这段ROP的作用就是调用 VirtualAlloc 开辟一段有具执行权限的区域，然后将shellcode放到这段区域内执行。具体原理可以看我的第二篇文章<a href="https://zero-day.cn/2020/05/14/windows10-bypass-dep-2/" target="_blank" rel="noopener">Windows 10 Bypass DEP (2)</a></p>
 <p>然后用 msfvenom 生成 shellcode:<br><code>./msfvenom -p windows/exec CMD=calc.exe -b &#39;\x00\x0A\x0D&#39; -f python -a x86</code></p>
 <p><img src="/image/15891083745190.jpg" alt=""></p>
 <h3 id="利用代码"><a href="#利用代码" class="headerlink" title="利用代码"></a>利用代码</h3><p>这里最终的利用代码，布局如下：<br><code>padding -&gt; rop chain（返回地址）-&gt; padding -&gt; shellcode -&gt; padding</code></p>
