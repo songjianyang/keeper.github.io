@@ -50,7 +50,7 @@
 <meta property="og:image" content="http://yoursite.com/image/15894435301861.jpg">
 <meta property="og:image" content="http://yoursite.com/image/15894439691582.jpg">
 <meta property="article:published_time" content="2020-05-14T06:34:13.175Z">
-<meta property="article:modified_time" content="2020-05-14T08:22:30.843Z">
+<meta property="article:modified_time" content="2020-05-14T08:27:11.164Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/image/15894401443426.jpg">
 
@@ -162,7 +162,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL <span class="title">VirtualProtect</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    LPVOID lpAddress, <span class="comment">// 目标地址起始位置(一般是shellcode的起始地址)</span></span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD dwSize, <span class="comment">// 大小 (修改属性的范围多大)</span></span></span></span><br><span class="line"><span class="function"><span class="params">    DWORD flNewProtect, <span class="comment">// 请求的保护方式  （保护属性）</span></span></span></span><br><span class="line"><span class="function"><span class="params">    PDWORD lpflOldProtect <span class="comment">// 保存老的保护方式 （随便一个可写的地址）</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>;</span><br></pre></td></tr></table></figure>
 
 <p>该函数用于修改一个区域的保护属性，可以将受到DEP保护的区域改成可执行区域。所以我们可以将shellcode布置到栈上，然后调用该函数将栈的属性改为可执行。</p>
-<p>关于 flNewProtect 参数，我们可以修改如下几个值。<br>我们使用0x40即可，将区域改成可读可写可执行（PAGE_EXECUTE_READ)。</p>
+<p>关于 flNewProtect 参数，我们可以修改如下几个值。<br>我们使用0x40即可，将区域改成可读可写可执行（PAGE_EXECUTE_READWRITE)。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Protection flags:</span><br><span class="line">    PAGE_EXECUTE &#x3D; 0x10</span><br><span class="line">    PAGE_EXECUTE_READ &#x3D; 0x20</span><br><span class="line">    PAGE_EXECUTE_READWRITE &#x3D; 0x40</span><br><span class="line">    PAGE_EXECUTE_WRITECOPY &#x3D; 0x80</span><br><span class="line">    PAGE_NOACCESS &#x3D; 0x01</span><br><span class="line">    PAGE_READONLY &#x3D; 0x02</span><br><span class="line">    PAGE_READWRITE &#x3D; 0x04</span><br><span class="line">    PAGE_WRITECOPY &#x3D; 0x08</span><br></pre></td></tr></table></figure>
 
 <h3 id="构造rop-chain"><a href="#构造rop-chain" class="headerlink" title="构造rop chain"></a>构造rop chain</h3><p>第一步，我们先来找 VirtualProtect 的调用，可以使用x64dbg（x32dbg），非常方便。</p>
