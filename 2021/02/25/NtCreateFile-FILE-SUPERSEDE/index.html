@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="description" content="通过 NtCreateFile 函数达到文件删除的作用"/>
+
+
+
+
+
+
+
+
+    <link rel="alternate" href="/default" title="Boxer">
+
+
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=1.1"/>
+
+
+
+<link rel="canonical" href="http://yoursite.com/2021/02/25/NtCreateFile-FILE-SUPERSEDE/"/>
+
+
+<meta name="description" content="在逻辑漏洞的挖掘过程中，文件删除操作是非常重要的一个攻击点，但是人们一般都是关心 DeleteFile 函数。我最近发现了一种比较隐蔽的文件删除方法，那就是通过NtCreateFile。 FILE_SUPERSEDE这是 docs 对该 flag 的解释，意思就是如果文件存在，就把它删掉，然后再创建一个新文件。  不过该 flag 只能在 NtCreateFile 上设置，而该函数一般用于驱动程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过 NtCreateFile 函数达到文件删除的作用">
+<meta property="og:url" content="http://yoursite.com/2021/02/25/NtCreateFile-FILE-SUPERSEDE/index.html">
+<meta property="og:site_name" content="Boxer">
+<meta property="og:description" content="在逻辑漏洞的挖掘过程中，文件删除操作是非常重要的一个攻击点，但是人们一般都是关心 DeleteFile 函数。我最近发现了一种比较隐蔽的文件删除方法，那就是通过NtCreateFile。 FILE_SUPERSEDE这是 docs 对该 flag 的解释，意思就是如果文件存在，就把它删掉，然后再创建一个新文件。  不过该 flag 只能在 NtCreateFile 上设置，而该函数一般用于驱动程序">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/image/16142441461808.jpg">
+<meta property="article:published_time" content="2021-02-25T08:58:05.904Z">
+<meta property="article:modified_time" content="2021-02-25T09:24:02.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/image/16142441461808.jpg">
+
+
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=1.1"/>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'>
+
+
+
+
+
+<script type="text/javascript">
+  var themeConfig = {
+    fancybox: {
+      enable: false
+    },
+  };
+</script>
+
+
+
+
+    
+
+
+
+
+
+    
+
+
+
+
+
+    <title> 通过 NtCreateFile 函数达到文件删除的作用 - Boxer </title>
+  <meta name="generator" content="Hexo 4.2.0"></head>
+
+  <body>
+    <div id="page">
+      <header id="masthead"><div class="site-header-inner">
+    <h1 class="site-title">
+        <a href="/." class="logo">Boxer</a>
+    </h1>
+
+    <nav id="nav-top">
+        
+            <ul id="menu-top" class="nav-top-items">
+                
+                    <li class="menu-item">
+                        <a href="https://github.com/songjianyang" target="_blank" rel="noopener">
+                            
+                            
+                                Github
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="https://twitter.com/SecBoxer" target="_blank" rel="noopener">
+                            
+                            
+                                Twitter
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/Links">
+                            
+                            
+                                Links
+                            
+                        </a>
+                    </li>
+                
+                    <li class="menu-item">
+                        <a href="/about">
+                            
+                            
+                                About
+                            
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        
+    </nav>
+
+</div>
+
+      </header>
+      <div id="content">
+        
+    <div id="primary">
+        
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">
+        
+          通过 NtCreateFile 函数达到文件删除的作用
+        
+      </h1>
+
+      <time class="post-time">
+          2021-02-25
+      </time>
+    </header>
+
+
+
+    
+            <div class="post-content">
+            <p>在逻辑漏洞的挖掘过程中，文件删除操作是非常重要的一个攻击点，但是人们一般都是关心 DeleteFile 函数。我最近发现了一种比较隐蔽的文件删除方法，那就是通过NtCreateFile。</p>
+<h3 id="FILE-SUPERSEDE"><a href="#FILE-SUPERSEDE" class="headerlink" title="FILE_SUPERSEDE"></a>FILE_SUPERSEDE</h3><p>这是 docs 对该 flag 的解释，意思就是如果文件存在，就把它删掉，然后再创建一个新文件。</p>
+<p><img src="/image/16142441461808.jpg" alt=""></p>
+<p>不过该 flag 只能在 NtCreateFile 上设置，而该函数一般用于驱动程序。但是驱动程序写起来比较麻烦，所以我写了一个普通的用户态程序来测试。</p>
+<p>运行后，原 test.txt 文件将会被删除，然后会创建一个新 test.txt。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"Winternl.h"</span></span></span><br><span class="line"></span><br><span class="line">NTSTATUS(WINAPI *pNtCreateFile)(PHANDLE FileHandle,</span><br><span class="line">	ACCESS_MASK DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,</span><br><span class="line">	PIO_STATUS_BLOCK IoStatusBlock, PVOID AllocationSize,</span><br><span class="line">	ULONG FileAttributes, ULONG ShareAccess, ULONG CreateDisposition,</span><br><span class="line">	ULONG CreateOptions, PVOID EaBuffer, ULONG EaLength);</span><br><span class="line"></span><br><span class="line">VOID(WINAPI *pRtlInitUnicodeString)(PUNICODE_STRING DestinationString,</span><br><span class="line">	PCWSTR SourceString);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	HANDLE pFile;</span><br><span class="line">	<span class="keyword">wchar_t</span> path[] = <span class="string">L"\\??\\H:\\script\\test.txt"</span>;</span><br><span class="line"></span><br><span class="line">	*(FARPROC *)&amp;pRtlInitUnicodeString =</span><br><span class="line">		GetProcAddress(GetModuleHandle(<span class="string">L"ntdll"</span>), <span class="string">"RtlInitUnicodeString"</span>);</span><br><span class="line"></span><br><span class="line">	*(FARPROC *)&amp;pNtCreateFile =</span><br><span class="line">		GetProcAddress(GetModuleHandle(<span class="string">L"ntdll"</span>), <span class="string">"NtCreateFile"</span>);</span><br><span class="line"></span><br><span class="line">	UNICODE_STRING file_fname;</span><br><span class="line">	pRtlInitUnicodeString(&amp;file_fname, path);</span><br><span class="line"></span><br><span class="line">	OBJECT_ATTRIBUTES obj_file;</span><br><span class="line">	InitializeObjectAttributes(&amp;obj_file, &amp;file_fname,</span><br><span class="line">		OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">	HANDLE file_handle; IO_STATUS_BLOCK io_file;</span><br><span class="line">	NTSTATUS ret = pNtCreateFile(&amp;file_handle, GENERIC_WRITE, &amp;obj_file,</span><br><span class="line">		&amp;io_file, <span class="literal">NULL</span>, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_WRITE,</span><br><span class="line">		FILE_SUPERSEDE, FILE_NON_DIRECTORY_FILE, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"Hello World!\n"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+            </div>
+          
+
+    
+  </article>
+
+    </div>
+
+      </div>
+
+      <footer id="colophon"><span class="copyright-year">
+    
+        &copy;
+    
+        2012 -
+    
+    2021
+    <span class="footer-author">.</span>
+    <span class="power-by">
+        Powered by <a class="hexo-link" href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> and <a class="theme-link" href="https://github.com/henryhuang/hexo-theme-polarbearsimple" target="_blank" rel="noopener">Polar Bear Simple</a>
+    </span>
+</span>
+
+      </footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div>
+    
+
+
+    
+
+
+    
+
+
+
+
+  
+    <script type="text/javascript" src="/lib/jquery/jquery-3.1.1.min.js"></script>
+  
+
+  
+
+    <script type="text/javascript" src="/js/src/theme.js?v=1.1"></script>
+<script type="text/javascript" src="/js/src/bootstrap.js?v=1.1"></script>
+
+    
+
+  
+ 
+  </script>
+  </body>
+</html>
